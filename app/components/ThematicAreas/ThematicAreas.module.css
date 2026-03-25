@@ -1,0 +1,221 @@
+/* ─── Section Shell ──────────────────────────────────────────────────────────── */
+.section {
+  position: relative;
+  padding-block: var(--section-pad);
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Ambient glow — purple tint far right to balance gold from hero */
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 55% 65% at 90% 50%, rgba(123, 104, 238, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 45% at 10% 80%, rgba(0, 184, 212, 0.06)   0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* ─── Section Header ─────────────────────────────────────────────────────────── */
+.header {
+  position: relative;
+  z-index: 1;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  margin-bottom: clamp(var(--space-lg), 6vw, 80px);
+}
+
+.label {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-teal);
+  margin-bottom: var(--space-xs);
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ─── Card Grid ──────────────────────────────────────────────────────────────── */
+.grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* ─── Card Base ──────────────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md) var(--space-md) var(--space-md);
+  background: var(--color-elevated);
+  border-top: 3px solid transparent;  /* color set by variant */
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+
+  /* Start hidden — JS adds .animate class on section intersection */
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Animate in */
+.card.animate {
+  animation: cardFadeUp 600ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Hover lift */
+.card {
+  transition:
+    transform 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+/* Focus-visible for keyboard nav */
+.card:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* ─── Card Variants ──────────────────────────────────────────────────────────── */
+.variantGold {
+  border-top-color: var(--color-gold);
+}
+.variantGold:hover {
+  box-shadow: var(--shadow-md), 0 0 32px rgba(185, 155, 35, 0.12);
+}
+
+.variantTeal {
+  border-top-color: var(--color-teal);
+}
+.variantTeal:hover {
+  box-shadow: var(--shadow-md), 0 0 32px rgba(0, 184, 212, 0.10);
+}
+
+.variantPurple {
+  border-top-color: #7B68EE;
+}
+.variantPurple:hover {
+  box-shadow: var(--shadow-md), 0 0 32px rgba(123, 104, 238, 0.12);
+}
+
+/* ─── Card Content ───────────────────────────────────────────────────────────── */
+.cardTop {
+  margin-bottom: var(--space-md);
+}
+
+.pillarLabel {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+
+.pillarName {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-feature-settings: "kern" 1;
+  /* color set by variant via inline style */
+}
+
+/* ─── Topic List ─────────────────────────────────────────────────────────────── */
+.topicList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.topic {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+
+.topicDash {
+  flex-shrink: 0;
+  width: 10px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+  position: relative;
+  top: -5px;
+}
+
+/* ─── Card Icon ──────────────────────────────────────────────────────────────── */
+.iconWrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-md);
+  opacity: 0.1;
+  /* color inherited from variant class via JS inline style */
+}
+
+.iconWrap svg {
+  width: 48px;
+  height: 48px;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────────── */
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

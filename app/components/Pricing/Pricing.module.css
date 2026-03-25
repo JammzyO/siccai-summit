@@ -1,0 +1,354 @@
+/* ─── Section Shell ──────────────────────────────────────────────────────────── */
+.section {
+  position: relative;
+  padding-block: var(--section-pad);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Radial glow — gold center to reinforce premium feel */
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(185, 155, 35, 0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 0%  50%, rgba(185, 155, 35, 0.04) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* ─── Section header ─────────────────────────────────────────────────────────── */
+.header {
+  position: relative;
+  z-index: 1;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  margin-bottom: clamp(var(--space-lg), 6vw, 80px);
+  text-align: center;
+}
+
+.label {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-teal);
+  margin-bottom: var(--space-xs);
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ─── Card grid ──────────────────────────────────────────────────────────────── */
+.grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: stretch;         /* stretch so featured card can bleed outside */
+  gap: var(--space-sm);
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  /* Extra vertical room so featured card's margin-block doesn't get clipped */
+  padding-block: 20px;
+}
+
+/* ─── Card base ──────────────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  background: var(--color-elevated);
+  border: 1px solid rgba(185, 155, 35, 0.25);
+  box-shadow: 0 2px 20px rgba(10, 22, 40, 0.5);
+  overflow: hidden;       /* clips the ribbon */
+
+  /* Stagger — start hidden */
+  opacity: 0;
+  transform: translateY(20px);
+
+  transition:
+    transform 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    border-color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.card.animate {
+  animation: cardUp 600ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ─── Featured card (Corporate · middle) ────────────────────────────────────── */
+.cardFeatured {
+  border: 2px solid var(--color-gold);
+  margin-block: -20px;          /* extends above & below peers */
+  padding-block: calc(var(--space-md) + 20px); /* compensate so inner content stays padded */
+  box-shadow: var(--shadow-gold);
+  z-index: 1;
+}
+
+.cardFeatured:hover {
+  box-shadow: var(--shadow-lg), var(--shadow-gold);
+}
+
+/* ─── "Most Popular" corner ribbon ──────────────────────────────────────────── */
+/*
+  Technique: absolutely positioned element, 90×90 clip box in card corner.
+  The ribbon itself is wider than the box; transform: rotate(45deg) angles it.
+  overflow: hidden on .card clips the excess.
+*/
+.ribbon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 90px;
+  height: 90px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ribbon::before {
+  content: 'Most Popular';
+  position: absolute;
+  top: 20px;
+  right: -22px;
+  width: 96px;
+  padding: 5px 0;
+  background: var(--color-gold);
+  color: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  transform: rotate(45deg);
+  transform-origin: center;
+}
+
+/* ─── Tier label ─────────────────────────────────────────────────────────────── */
+.tierLabel {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-md);
+}
+
+/* ─── Price block ────────────────────────────────────────────────────────────── */
+.priceBlock {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.currency {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  margin-top: 8px;   /* optical alignment to price cap-height */
+}
+
+.price {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 5.5vw, 68px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+  line-height: 0.95;
+  font-feature-settings: "tnum" 1;
+}
+
+.dateRange {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-md);
+}
+
+/* ─── Divider ────────────────────────────────────────────────────────────────── */
+.cardDivider {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border);
+  border: none;
+  margin-bottom: var(--space-md);
+}
+
+/* ─── Inclusions list ────────────────────────────────────────────────────────── */
+.inclusions {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;                /* pushes CTA to bottom */
+  margin-bottom: var(--space-md);
+}
+
+.inclusion {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+  margin-top: 5px;
+}
+
+/* ─── CTA buttons ────────────────────────────────────────────────────────────── */
+.ctaBase {
+  display: block;
+  width: 100%;
+  padding: 12px var(--space-md);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.ctaBase:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+.ctaBase:active {
+  transform: translateY(1px);
+}
+
+/* Tier 1 — Networking: outlined gold */
+.ctaOutlined {
+  color: var(--color-gold);
+  background: transparent;
+  border-color: var(--color-gold);
+  transition:
+    background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.ctaOutlined:hover {
+  background: rgba(185, 155, 35, 0.08);
+}
+
+/* Tier 2 — Corporate: solid gold */
+.ctaSolidGold {
+  color: var(--color-bg);
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+  transition:
+    background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.ctaSolidGold:hover {
+  background: #C9AC33;
+  box-shadow: 0 4px 20px rgba(185, 155, 35, 0.35);
+}
+
+/* Tier 3 — Individual: solid teal */
+.ctaSolidTeal {
+  color: var(--color-bg);
+  background: var(--color-teal);
+  border-color: var(--color-teal);
+  transition:
+    background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.ctaSolidTeal:hover {
+  background: #00cce8;
+  box-shadow: 0 4px 20px rgba(0, 184, 212, 0.3);
+}
+
+/* ─── Small print ────────────────────────────────────────────────────────────── */
+.footnote {
+  position: relative;
+  z-index: 1;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  padding-top: clamp(var(--space-lg), 4vw, 48px);
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.footnote a {
+  color: var(--color-gold-dim);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.footnote a:hover {
+  color: var(--color-gold);
+}
+
+/* ─── Keyframe ───────────────────────────────────────────────────────────────── */
+@keyframes cardUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    padding-block: 0;
+  }
+
+  .cardFeatured {
+    margin-block: 0;
+    padding-block: var(--space-md);
+  }
+}

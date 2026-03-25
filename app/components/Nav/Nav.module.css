@@ -1,0 +1,270 @@
+/* ─── Nav Shell ──────────────────────────────────────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  height: 72px;
+
+  /* Transparent at top — JS adds .scrolled class */
+  background: transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border-bottom: 1px solid transparent;
+
+  transition:
+    background 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    -webkit-backdrop-filter 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav.scrolled {
+  background: rgba(20, 65, 105, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: var(--color-border);
+}
+
+/* ─── Inner layout ───────────────────────────────────────────────────────────── */
+.inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  gap: var(--space-md);
+}
+
+/* ─── Logo ───────────────────────────────────────────────────────────────────── */
+.logoWrap {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+}
+
+.logoWrap a {
+  display: block;
+  line-height: 0;
+}
+
+/* ─── Countdown ──────────────────────────────────────────────────────────────── */
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  justify-self: center;
+}
+
+.countUnit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 36px;
+}
+
+.countNum {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-gold);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.countLabel {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.countDivider {
+  color: var(--color-gold-dim);
+  font-size: 1rem;
+  font-weight: 300;
+  align-self: flex-start;
+  padding-top: 2px;
+  user-select: none;
+}
+
+/* ─── CTA ────────────────────────────────────────────────────────────────────── */
+.ctaWrap {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 24px;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid var(--color-gold);
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.cta:hover {
+  background: var(--color-gold);
+  color: var(--color-bg);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+.cta:active {
+  transform: translateY(1px);
+}
+
+/* Highlighted state — triggered after scrolling past hero (JS adds .ctaHighlight) */
+.nav.ctaHighlight .cta {
+  background: var(--color-gold);
+  color: var(--color-bg);
+}
+
+/* ─── Mobile hamburger ───────────────────────────────────────────────────────── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger span {
+  display: block;
+  height: 1.5px;
+  background: var(--color-text);
+  transform-origin: center;
+  transition:
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* ─── Mobile drawer ──────────────────────────────────────────────────────────── */
+.mobileMenu {
+  display: none;
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  background: rgba(20, 65, 105, 0.99);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-md) var(--container-pad) var(--space-lg);
+  z-index: 899;
+
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition:
+    opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobileMenu.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mobileCountdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+}
+
+.mobileCta {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-md);
+  padding: 14px 24px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid var(--color-gold);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.mobileCta:hover,
+.mobileCta:focus-visible {
+  background: var(--color-gold);
+  color: var(--color-bg);
+}
+
+.mobileCta:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+/* ─── Responsive breakpoints ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Hide desktop countdown and CTA in inner grid */
+  .countdown,
+  .ctaWrap {
+    display: none;
+  }
+
+  /* Reconfigure grid: logo left, hamburger right */
+  .inner {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .hamburger {
+    display: flex;
+    grid-column: 3;
+  }
+
+  /* Show mobile drawer */
+  .mobileMenu {
+    display: block;
+  }
+}

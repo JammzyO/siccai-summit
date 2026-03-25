@@ -1,0 +1,228 @@
+/* ─── Section Shell ──────────────────────────────────────────────────────────── */
+.section {
+  position: relative;
+  padding-block: var(--section-pad);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Subtle top-edge gold gradient to blend into hero */
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 65% 50% at 100% 50%, rgba(185, 155, 35, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 0%   80%, rgba(  0, 184, 212, 0.04) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* ─── Two-column grid ────────────────────────────────────────────────────────── */
+.grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: clamp(var(--space-lg), 6vw, 96px);
+  align-items: start;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* ─── Left Column ────────────────────────────────────────────────────────────── */
+.left {
+  position: relative;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: var(--space-sm);
+}
+
+/* Decorative "2026" — outlined, large, sits in the background */
+.year {
+  position: absolute;
+  top: -20px;
+  left: -16px;
+  font-family: var(--font-display);
+  font-size: clamp(100px, 14vw, 160px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(185, 155, 35, 0.25);
+  user-select: none;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Vertical gold rule */
+.meta {
+  display: flex;
+  gap: var(--space-md);
+  position: relative;
+}
+
+.metaRule {
+  flex-shrink: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-gold) 0%,
+    rgba(185, 155, 35, 0.15) 100%
+  );
+  border-radius: 2px;
+  align-self: stretch;
+  min-height: 120px;
+}
+
+.metaContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.metaLabel {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.metaValue {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+/* ─── Right Column ───────────────────────────────────────────────────────────── */
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.label {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-teal);
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+  font-feature-settings: "kern" 1, "liga" 1;
+  margin-top: var(--space-xs);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.bodyP {
+  font-family: var(--font-body);
+  font-size: clamp(0.9375rem, 1.4vw, 1rem);
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--color-muted);
+}
+
+/* ─── Stat Pills ─────────────────────────────────────────────────────────────── */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-elevated);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  white-space: nowrap;
+  transition: border-color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.pill:hover {
+  border-color: var(--color-gold-dim);
+}
+
+/* Small teal dot inside pill */
+.pillDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+/* ─── Responsive: single column ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .left {
+    min-height: 0;
+  }
+
+  .year {
+    font-size: 96px;
+    top: -8px;
+    left: -8px;
+    opacity: 0.6;
+  }
+
+  .meta {
+    padding-top: 80px; /* clear the year text */
+  }
+
+  .pills {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pill {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 480px) {
+  .year {
+    font-size: 72px;
+  }
+}
