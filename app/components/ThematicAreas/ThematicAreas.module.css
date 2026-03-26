@@ -28,9 +28,19 @@
   padding-inline: var(--container-pad);
 }
 
-/* ─── Section Header ─────────────────────────────────────────────────────────── */
-.header {
-  margin-bottom: clamp(var(--space-lg), 5vw, 64px);
+/* ─── Two-column grid ────────────────────────────────────────────────────────── */
+.twoCol {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: clamp(40px, 5vw, 80px);
+  align-items: center;
+}
+
+/* ─── Left column — static intro ────────────────────────────────────────────── */
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .sectionLabel {
@@ -41,129 +51,84 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-teal);
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 
 .heading {
   font-family: var(--font-display);
-  font-size: clamp(28px, 3.5vw, 44px);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-  color: var(--color-text);
-  font-feature-settings: "kern" 1, "liga" 1;
-}
-
-/* ─── Two-column layout ───────────────────────────────────────────────────────── */
-.twoCol {
-  display: grid;
-  grid-template-columns: 2fr 3fr;
-  gap: clamp(var(--space-lg), 4vw, 64px);
-  align-items: stretch;
-}
-
-/* ─── Left column — active pillar content ─────────────────────────────────────── */
-.leftCol {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-@keyframes contentEnter {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.leftContent {
-  animation: contentEnter 420ms cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-.contentLabel {
-  display: inline-block;
-  font-family: var(--font-body);
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: var(--space-xs);
-}
-
-.contentTitle {
-  font-family: var(--font-display);
-  font-size: clamp(24px, 2.8vw, 36px);
+  font-size: clamp(32px, 4vw, 52px);
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   color: var(--color-text);
-  margin-bottom: var(--space-sm);
   font-feature-settings: "kern" 1, "liga" 1;
-}
-
-.contentDesc {
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 300;
-  line-height: 1.7;
-  color: var(--color-muted);
   margin-bottom: var(--space-md);
 }
 
-/* ─── Topic list ─────────────────────────────────────────────────────────────── */
-.topicList {
+.leftDesc {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--color-muted);
+  margin-bottom: var(--space-lg);
+  max-width: 38ch;
+}
+
+/* ─── Pillar tag list ─────────────────────────────────────────────────────────── */
+.pillarTags {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: var(--space-lg);
+  gap: 10px;
+  margin-bottom: var(--space-xl);
 }
 
-.topicItem {
+.pillarTag {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
   font-family: var(--font-body);
   font-size: 0.8125rem;
-  font-weight: 300;
-  line-height: 1.55;
+  font-weight: 400;
   color: var(--color-muted);
+  letter-spacing: 0.02em;
 }
 
-.topicDash {
+.tagDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   flex-shrink: 0;
-  width: 10px;
-  height: 1px;
-  opacity: 0.6;
-  position: relative;
-  top: -3px;
 }
 
-/* ─── CTA button ─────────────────────────────────────────────────────────────── */
+.tagNum {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.25);
+  min-width: 18px;
+}
+
+/* ─── CTA link ────────────────────────────────────────────────────────────────── */
 .cta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0;
-  background: transparent;
-  border: none;
   font-family: var(--font-body);
   font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-gold);
-  cursor: pointer;
+  text-decoration: none;
   transition: opacity 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
               transform 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
 .cta:hover {
-  opacity: 0.78;
+  opacity: 0.75;
 }
 
 .cta:focus-visible {
@@ -182,20 +147,23 @@
 }
 
 .cta:hover .ctaArrow {
-  transform: translateX(4px);
+  transform: translateY(3px);
 }
 
-/* ─── Right column — accordion ────────────────────────────────────────────────── */
+/* ─── Right column ────────────────────────────────────────────────────────────── */
 .rightCol {
-  /* Bleeds to the right of the container */
+  /* stretch to full height of twoCol row */
 }
 
 /* ─── Accordion container ────────────────────────────────────────────────────── */
 .accordion {
   display: flex;
-  height: 480px;
-  border-radius: 8px;
+  height: 540px;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 16px 48px rgba(0, 0, 0, 0.4);
 }
 
 /* ─── Panel base ─────────────────────────────────────────────────────────────── */
@@ -203,37 +171,19 @@
   position: relative;
   flex-grow: 0;
   flex-shrink: 0;
-  flex-basis: 48px;
+  flex-basis: 60px;
   overflow: hidden;
   cursor: pointer;
-  border-right: 1px solid var(--color-border);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   outline: none;
 
-  transition: flex-grow 560ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: flex-grow 600ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .panel:last-child {
   border-right: none;
 }
 
-/* Surface brightening via pseudo — no background-color animation */
-.panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: rgba(255, 255, 255, 0);
-  opacity: 0;
-  transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-}
-
-.panelActive::before {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.02);
-}
-
-/* Active state — expand */
 .panelActive {
   flex-grow: 1;
 }
@@ -256,8 +206,7 @@
 }
 
 /*
-  Cyber Security — circuit-board grid:
-  layered linear gradients produce a grid; radial gradient adds dots at nodes
+  Cyber Security — circuit-board grid
 */
 .variantGold .panelBg {
   background-image:
@@ -266,6 +215,7 @@
     radial-gradient(circle, rgba(185, 155, 35, 0.22) 1.5px, transparent 1.5px);
   background-size: 60px 60px, 60px 60px, 60px 60px;
   background-position: 0 0, 0 0, 30px 30px;
+  background-color: rgba(10, 22, 40, 0.97);
 }
 
 /*
@@ -275,6 +225,7 @@
   background-image:
     radial-gradient(circle, rgba(0, 184, 212, 0.2) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
+  background-color: rgba(6, 18, 32, 0.97);
 }
 
 /*
@@ -290,103 +241,225 @@
       transparent 50%
     );
   background-size: 24px 24px;
+  background-color: rgba(8, 16, 34, 0.97);
 }
 
-/* Gradient overlay — heavy at bottom, light at top */
+/* ─── Gradient overlay — heavy at bottom ────────────────────────────────────── */
 .panelGradient {
   position: absolute;
   inset: 0;
   z-index: 1;
   background: linear-gradient(
     to top,
-    rgba(8, 21, 37, 0.92) 0%,
-    rgba(8, 21, 37, 0.55) 45%,
-    rgba(8, 21, 37, 0.20) 100%
+    rgba(5, 14, 28, 0.97) 0%,
+    rgba(5, 14, 28, 0.65) 40%,
+    rgba(5, 14, 28, 0.15) 100%
   );
 }
 
 /* ─── Ghost index number ─────────────────────────────────────────────────────── */
 .ghostIndex {
   position: absolute;
-  bottom: -10px;
-  right: 16px;
+  bottom: -16px;
+  right: 12px;
   font-family: var(--font-display);
-  font-size: clamp(100px, 12vw, 180px);
+  font-size: clamp(90px, 11vw, 160px);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.05em;
-  color: var(--color-gold);
-  opacity: 0.06;
+  color: rgba(255, 255, 255, 0.04);
   user-select: none;
   pointer-events: none;
   z-index: 2;
 
-  transform: translateY(0);
+  opacity: 0;
   transition: opacity 380ms cubic-bezier(0.4, 0, 0.2, 1) 200ms;
 }
 
-/* Hide ghost on collapsed panels */
-.panel:not(.panelActive) .ghostIndex {
-  opacity: 0;
-  transition: opacity 180ms cubic-bezier(0.0, 0.0, 0.2, 1);
+.panelActive .ghostIndex {
+  opacity: 1;
 }
 
-/* ─── Collapsed label — rotated name ────────────────────────────────────────── */
+/* ─── Collapsed label — rotated, fades out when expanded ─────────────────────── */
 .collapsedLabel {
   position: absolute;
   inset: 0;
   z-index: 3;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  padding-bottom: var(--space-lg);
+  gap: 12px;
   pointer-events: none;
 
   opacity: 1;
-  transition: opacity 180ms cubic-bezier(0.0, 0.0, 0.2, 1);
+  transition: opacity 160ms cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
 .panelActive .collapsedLabel {
   opacity: 0;
-  transition: opacity 130ms cubic-bezier(0.0, 0.0, 0.2, 1);
+  transition: opacity 100ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.labelIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.labelIcon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .rotatedName {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   font-family: var(--font-display);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   color: var(--color-text);
   white-space: nowrap;
   user-select: none;
+  opacity: 0.85;
 }
 
-/* Dim non-active labels slightly */
+/* Dim non-active labels */
 .accordion:has(.panelActive) .panel:not(.panelActive) .rotatedName {
-  opacity: 0.5;
+  opacity: 0.4;
   transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ─── Responsive: mobile stacked layout ──────────────────────────────────────── */
-@media (max-width: 860px) {
+/* ─── Expanded content — lives inside panel, reveals on hover ────────────────── */
+.expandedContent {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  padding: var(--space-lg) var(--space-md);
+  z-index: 3;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  /* clip so content stays within the panel width */
+  overflow: hidden;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+
+  /* Collapse: fast fade out */
+  transition:
+    opacity 180ms cubic-bezier(0.0, 0.0, 0.2, 1) 0ms,
+    transform 180ms cubic-bezier(0.0, 0.0, 0.2, 1) 0ms;
+}
+
+.panelActive .expandedContent {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  /* Expand: delay until panel is mostly open (~60% of 600ms = 360ms) */
+  transition:
+    opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 360ms,
+    transform 300ms cubic-bezier(0.4, 0, 0.2, 1) 360ms;
+}
+
+/* Pillar number label */
+.contentPillarNum {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+/* Pillar name */
+.contentTitle {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+  white-space: nowrap;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* Description */
+.contentDesc {
+  font-family: var(--font-body);
+  font-size: 0.78125rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: var(--space-sm);
+
+  /* Limit width so it stays readable inside the expanded panel */
+  max-width: 340px;
+}
+
+/* ─── Sub-topic list ─────────────────────────────────────────────────────────── */
+.topicList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topicItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.71875rem;
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+/* Thin accent dash */
+.topicDash {
+  flex-shrink: 0;
+  width: 8px;
+  height: 1px;
+  opacity: 0.55;
+  position: relative;
+  top: -2px;
+}
+
+/* ─── Responsive: tablet / mobile ───────────────────────────────────────────── */
+@media (max-width: 900px) {
   .twoCol {
     grid-template-columns: 1fr;
-    gap: var(--space-lg);
+    gap: var(--space-xl);
+  }
+
+  .leftDesc {
+    max-width: 100%;
   }
 
   .accordion {
-    flex-direction: column;
     height: auto;
-    border-radius: 6px;
+    flex-direction: column;
+    border-radius: 8px;
   }
 
   .panel {
     flex-grow: 0;
     flex-shrink: 0;
-    flex-basis: 56px;
+    flex-basis: 60px;
     border-right: none;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     transition: flex-basis 500ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -396,15 +469,17 @@
 
   .panelActive {
     flex-grow: 0;
-    flex-basis: 320px;
+    flex-basis: 400px;
   }
 
-  /* Horizontal label on mobile */
+  /* Horizontal label row on mobile */
   .collapsedLabel {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+    padding-bottom: 0;
     padding-left: var(--space-md);
+    gap: var(--space-sm);
   }
 
   .rotatedName {
@@ -415,7 +490,21 @@
   }
 
   .ghostIndex {
-    font-size: 72px;
+    font-size: 64px;
+    bottom: -8px;
+    right: 8px;
+  }
+
+  .expandedContent {
+    padding-top: 80px;
+  }
+
+  .contentTitle {
+    white-space: normal;
+  }
+
+  .topicItem {
+    white-space: normal;
   }
 }
 
@@ -430,18 +519,17 @@
     transition: none;
   }
 
-  .leftContent {
-    animation: none;
-    opacity: 1;
+  .expandedContent {
+    transition: none;
     transform: none;
+  }
+
+  .panelActive .expandedContent {
+    transition: none;
   }
 
   .cta,
   .ctaArrow {
-    transition: none;
-  }
-
-  .panel::before {
     transition: none;
   }
 }

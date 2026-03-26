@@ -120,64 +120,56 @@ const PILLARS = [
 
 /* ─── Component ──────────────────────────────────────────────────────────────── */
 export default function ThematicAreas() {
-  /* Default: Cyber Security active. Stays on last hovered — no reset on leave. */
   const [active, setActive] = useState(0)
-  const pillar = PILLARS[active]
 
   return (
     <section className={styles.section} aria-labelledby="thematic-heading">
       <div className={styles.inner}>
-
-        {/* Section header */}
-        <header className={styles.header}>
-          <span className={styles.sectionLabel}>Key Thematic Areas</span>
-          <h2 id="thematic-heading" className={styles.heading}>
-            Three Pillars of the Summit
-          </h2>
-        </header>
-
-        {/* Two-column layout */}
         <div className={styles.twoCol}>
 
-          {/* ── Left column: content for active pillar ── */}
+          {/* ── Left column: static intro copy ── */}
           <div className={styles.leftCol}>
-            {/* key forces CSS animation to retrigger on every active change */}
-            <div key={active} className={styles.leftContent}>
-              <span
-                className={styles.contentLabel}
-                style={{ color: pillar.accentColor }}
-              >
-                Pillar {pillar.number}
-              </span>
-              <h3 className={styles.contentTitle}>{pillar.name}</h3>
-              <p className={styles.contentDesc}>{pillar.description}</p>
-              <ul className={styles.topicList} aria-label={`${pillar.name} sub-topics`}>
-                {pillar.topics.map(topic => (
-                  <li key={topic} className={styles.topicItem}>
-                    <span
-                      className={styles.topicDash}
-                      style={{ background: pillar.accentColor }}
-                      aria-hidden="true"
-                    />
-                    {topic}
-                  </li>
-                ))}
-              </ul>
-              <button type="button" className={styles.cta}>
-                Explore This Track{' '}
-                <span className={styles.ctaArrow} aria-hidden="true">→</span>
-              </button>
-            </div>
+            <span className={styles.sectionLabel}>Key Thematic Areas</span>
+            <h2 id="thematic-heading" className={styles.heading}>
+              Three Pillars of<br />the Summit
+            </h2>
+            <p className={styles.leftDesc}>
+              Every session, workshop, and roundtable at the summit is structured around
+              three interconnected pillars — each designed to bridge the gap between
+              technical complexity and executive decision-making.
+            </p>
+            <ul className={styles.pillarTags} aria-label="Summit pillars">
+              {PILLARS.map(({ id, number, name, accentColor }) => (
+                <li key={id} className={styles.pillarTag}>
+                  <span
+                    className={styles.tagDot}
+                    style={{ background: accentColor }}
+                    aria-hidden="true"
+                  />
+                  <span className={styles.tagNum}>{number}</span>
+                  {name}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="/siccai-cape-town-summit-brochure.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.cta}
+            >
+              Download Programme{' '}
+              <span className={styles.ctaArrow} aria-hidden="true">↓</span>
+            </a>
           </div>
 
-          {/* ── Right column: accordion panels ── */}
+          {/* ── Right column: accordion — content lives inside each panel ── */}
           <div className={styles.rightCol}>
             <div
               className={styles.accordion}
               role="list"
               aria-label="Summit pillars"
             >
-              {PILLARS.map(({ id, number, name, variantClass }, i) => {
+              {PILLARS.map(({ id, number, name, accentColor, variantClass, description, topics, Icon }, i) => {
                 const isActive = active === i
                 return (
                   <article
@@ -188,22 +180,55 @@ export default function ThematicAreas() {
                     onMouseEnter={() => setActive(i)}
                     onFocus={() => setActive(i)}
                     aria-label={`Pillar ${number}: ${name}`}
-                    aria-current={isActive ? true : undefined}
+                    aria-expanded={isActive}
                   >
                     {/* Background pattern */}
                     <div className={styles.panelBg} aria-hidden="true" />
                     {/* Gradient overlay */}
                     <div className={styles.panelGradient} aria-hidden="true" />
 
-                    {/* Collapsed label — rotated name, hidden when active */}
-                    <div className={styles.collapsedLabel} aria-hidden="true">
-                      <span className={styles.rotatedName}>{name}</span>
-                    </div>
-
-                    {/* Ghost index number — visible only when active */}
+                    {/* Ghost index number */}
                     <span className={styles.ghostIndex} aria-hidden="true">
                       {number}
                     </span>
+
+                    {/* Collapsed label — rotated name, fades out when expanded */}
+                    <div className={styles.collapsedLabel} aria-hidden="true">
+                      <span
+                        className={styles.labelIcon}
+                        style={{ color: accentColor }}
+                      >
+                        <Icon />
+                      </span>
+                      <span className={styles.rotatedName}>{name}</span>
+                    </div>
+
+                    {/* Expanded content — fades in when panel is active */}
+                    <div className={styles.expandedContent}>
+                      <span
+                        className={styles.contentPillarNum}
+                        style={{ color: accentColor }}
+                      >
+                        Pillar {number}
+                      </span>
+                      <h3 className={styles.contentTitle}>{name}</h3>
+                      <p className={styles.contentDesc}>{description}</p>
+                      <ul
+                        className={styles.topicList}
+                        aria-label={`${name} sub-topics`}
+                      >
+                        {topics.map(topic => (
+                          <li key={topic} className={styles.topicItem}>
+                            <span
+                              className={styles.topicDash}
+                              style={{ background: accentColor }}
+                              aria-hidden="true"
+                            />
+                            {topic}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </article>
                 )
               })}
