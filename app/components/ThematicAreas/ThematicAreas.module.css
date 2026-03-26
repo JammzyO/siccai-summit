@@ -111,6 +111,14 @@
   min-width: 18px;
 }
 
+/* ─── CTA row ────────────────────────────────────────────────────────────────── */
+.ctaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
 /* ─── CTA link ────────────────────────────────────────────────────────────────── */
 .cta {
   display: inline-flex;
@@ -148,6 +156,40 @@
 
 .cta:hover .ctaArrow {
   transform: translateY(3px);
+}
+
+/* Register CTA — outlined gold button */
+.ctaRegister {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border: 1px solid var(--color-gold);
+  border-radius: 3px;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  text-decoration: none;
+  transition: background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+              color 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+              transform 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.ctaRegister:hover {
+  background: var(--color-gold);
+  color: var(--color-bg);
+}
+
+.ctaRegister:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+.ctaRegister:active {
+  transform: translateY(1px);
 }
 
 /* ─── Right column ────────────────────────────────────────────────────────────── */

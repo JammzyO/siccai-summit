@@ -151,15 +151,21 @@ export default function ThematicAreas() {
                 </li>
               ))}
             </ul>
-            <a
-              href="/siccai-cape-town-summit-brochure.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.cta}
-            >
-              Download Programme{' '}
-              <span className={styles.ctaArrow} aria-hidden="true">↓</span>
-            </a>
+            <div className={styles.ctaRow}>
+              <a
+                href="/siccai-cape-town-summit-brochure.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.cta}
+              >
+                Download Programme{' '}
+                <span className={styles.ctaArrow} aria-hidden="true">↓</span>
+              </a>
+              <a href="#form-heading" className={styles.ctaRegister}>
+                Register Now{' '}
+                <span className={styles.ctaArrow} aria-hidden="true">→</span>
+              </a>
+            </div>
           </div>
 
           {/* ── Right column: accordion — content lives inside each panel ── */}
