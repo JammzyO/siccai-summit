@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import styles from './ThematicAreas.module.css'
 
 /* ─── SVG Icons ──────────────────────────────────────────────────────────────── */
@@ -9,11 +9,11 @@ function ShieldIcon() {
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path
         d="M12 2.5L3.5 7v4.75C3.5 17.1 7.3 21.6 12 23c4.7-1.4 8.5-5.9 8.5-11.25V7L12 2.5z"
-        stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"
+        stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
       />
       <path
         d="M8.75 12l2.5 2.5 4-5"
-        stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"
+        stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"
       />
     </svg>
   )
@@ -22,25 +22,20 @@ function ShieldIcon() {
 function NeuralNetIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      {/* Input nodes */}
       <circle cx="4"  cy="5.5"  r="1.6" stroke="currentColor" strokeWidth="1.2"/>
       <circle cx="4"  cy="12"   r="1.6" stroke="currentColor" strokeWidth="1.2"/>
       <circle cx="4"  cy="18.5" r="1.6" stroke="currentColor" strokeWidth="1.2"/>
-      {/* Hidden nodes */}
-      <circle cx="12" cy="8.75" r="1.6" stroke="currentColor" strokeWidth="1.2"/>
+      <circle cx="12" cy="8.75"  r="1.6" stroke="currentColor" strokeWidth="1.2"/>
       <circle cx="12" cy="15.25" r="1.6" stroke="currentColor" strokeWidth="1.2"/>
-      {/* Output node */}
-      <circle cx="20" cy="12" r="1.6" stroke="currentColor" strokeWidth="1.2"/>
-      {/* Input → Hidden connections */}
-      <line x1="5.6"  y1="5.5"  x2="10.4" y2="8.75"  stroke="currentColor" strokeWidth="0.7" opacity="0.55"/>
-      <line x1="5.6"  y1="5.5"  x2="10.4" y2="15.25" stroke="currentColor" strokeWidth="0.7" opacity="0.55"/>
-      <line x1="5.6"  y1="12"   x2="10.4" y2="8.75"  stroke="currentColor" strokeWidth="0.7" opacity="0.55"/>
-      <line x1="5.6"  y1="12"   x2="10.4" y2="15.25" stroke="currentColor" strokeWidth="0.7" opacity="0.55"/>
-      <line x1="5.6"  y1="18.5" x2="10.4" y2="8.75"  stroke="currentColor" strokeWidth="0.7" opacity="0.55"/>
-      <line x1="5.6"  y1="18.5" x2="10.4" y2="15.25" stroke="currentColor" strokeWidth="0.7" opacity="0.55"/>
-      {/* Hidden → Output connections */}
-      <line x1="13.6" y1="8.75"  x2="18.4" y2="12" stroke="currentColor" strokeWidth="0.7" opacity="0.55"/>
-      <line x1="13.6" y1="15.25" x2="18.4" y2="12" stroke="currentColor" strokeWidth="0.7" opacity="0.55"/>
+      <circle cx="20" cy="12"   r="1.6" stroke="currentColor" strokeWidth="1.2"/>
+      <line x1="5.6"  y1="5.5"  x2="10.4" y2="8.75"  stroke="currentColor" strokeWidth="0.7" opacity="0.6"/>
+      <line x1="5.6"  y1="5.5"  x2="10.4" y2="15.25" stroke="currentColor" strokeWidth="0.7" opacity="0.6"/>
+      <line x1="5.6"  y1="12"   x2="10.4" y2="8.75"  stroke="currentColor" strokeWidth="0.7" opacity="0.6"/>
+      <line x1="5.6"  y1="12"   x2="10.4" y2="15.25" stroke="currentColor" strokeWidth="0.7" opacity="0.6"/>
+      <line x1="5.6"  y1="18.5" x2="10.4" y2="8.75"  stroke="currentColor" strokeWidth="0.7" opacity="0.6"/>
+      <line x1="5.6"  y1="18.5" x2="10.4" y2="15.25" stroke="currentColor" strokeWidth="0.7" opacity="0.6"/>
+      <line x1="13.6" y1="8.75"  x2="18.4" y2="12"   stroke="currentColor" strokeWidth="0.7" opacity="0.6"/>
+      <line x1="13.6" y1="15.25" x2="18.4" y2="12"   stroke="currentColor" strokeWidth="0.7" opacity="0.6"/>
     </svg>
   )
 }
@@ -48,35 +43,32 @@ function NeuralNetIcon() {
 function ScalesIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      {/* Centre column */}
       <line x1="12" y1="3.5" x2="12" y2="21" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-      {/* Beam */}
       <line x1="4.5" y1="7" x2="19.5" y2="7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-      {/* Fulcrum dot */}
       <circle cx="12" cy="7" r="1.4" fill="currentColor"/>
-      {/* Left pan chains */}
-      <line x1="6.5" y1="7" x2="5"   y2="13.5" stroke="currentColor" strokeWidth="0.75" strokeLinecap="round"/>
-      <line x1="6.5" y1="7" x2="8"   y2="13.5" stroke="currentColor" strokeWidth="0.75" strokeLinecap="round"/>
-      {/* Left pan arc */}
+      <line x1="6.5" y1="7" x2="5"  y2="13.5" stroke="currentColor" strokeWidth="0.75" strokeLinecap="round"/>
+      <line x1="6.5" y1="7" x2="8"  y2="13.5" stroke="currentColor" strokeWidth="0.75" strokeLinecap="round"/>
       <path d="M4 13.5 Q6.5 16.5 9 13.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-      {/* Right pan chains */}
-      <line x1="17.5" y1="7" x2="16"  y2="13.5" stroke="currentColor" strokeWidth="0.75" strokeLinecap="round"/>
-      <line x1="17.5" y1="7" x2="19"  y2="13.5" stroke="currentColor" strokeWidth="0.75" strokeLinecap="round"/>
-      {/* Right pan arc */}
+      <line x1="17.5" y1="7" x2="16" y2="13.5" stroke="currentColor" strokeWidth="0.75" strokeLinecap="round"/>
+      <line x1="17.5" y1="7" x2="19" y2="13.5" stroke="currentColor" strokeWidth="0.75" strokeLinecap="round"/>
       <path d="M15 13.5 Q17.5 16.5 20 13.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-      {/* Base */}
       <line x1="9" y1="21" x2="15" y2="21" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
     </svg>
   )
 }
 
-/* ─── Data — sub-topics verbatim from PDF ────────────────────────────────────── */
+/* ─── Data ───────────────────────────────────────────────────────────────────── */
 const PILLARS = [
   {
-    variant:   styles.variantGold,
-    color:     'var(--color-gold)',
-    number:    '01',
-    name:      'Cyber Security',
+    id:           'cyber',
+    number:       '01',
+    name:         'Cyber Security',
+    accentColor:  'var(--color-gold)',
+    variantClass: styles.variantGold,
+    description:
+      "Africa's digital infrastructure faces an escalating wave of sophisticated threats. " +
+      'This pillar addresses how leaders can build resilient defenses across critical systems, ' +
+      'financial networks, and national infrastructure.',
     topics: [
       'Cyber threats facing Africa',
       'Critical infrastructure protection',
@@ -85,28 +77,36 @@ const PILLARS = [
       'Cybercrime trends and defense strategies',
     ],
     Icon: ShieldIcon,
-    delay: 0,
   },
   {
-    variant:   styles.variantTeal,
-    color:     'var(--color-teal)',
-    number:    '02',
-    name:      'Artificial Intelligence',
+    id:           'ai',
+    number:       '02',
+    name:         'Artificial Intelligence',
+    accentColor:  'var(--color-teal)',
+    variantClass: styles.variantTeal,
+    description:
+      'AI presents transformative opportunities for African economies — and significant ' +
+      "governance challenges. This pillar examines responsible adoption, ethical oversight, " +
+      "and AI's role in strengthening cybersecurity.",
     topics: [
       'AI opportunities for African economies',
-      'AI risks, misuse and cyber threats',
-      'AI governance, ethics and regulation',
+      'AI risks, misuse, and cyber threats',
+      'AI governance, ethics, and regulation',
       'AI for cybersecurity and threat detection',
       'Responsible and secure AI deployment',
     ],
     Icon: NeuralNetIcon,
-    delay: 120,
   },
   {
-    variant:   styles.variantPurple,
-    color:     '#7B68EE',
-    number:    '03',
-    name:      'Policy & Leadership',
+    id:           'policy',
+    number:       '03',
+    name:         'Policy & Leadership',
+    accentColor:  '#9B8FEE',
+    variantClass: styles.variantPurple,
+    description:
+      'Cyber risk is no longer an IT issue — it sits at the board table. This pillar ' +
+      'equips policymakers and executives with frameworks for national strategy, data ' +
+      'governance, and public-private collaboration.',
     topics: [
       'National and regional cyber strategies',
       'Data protection and privacy',
@@ -115,87 +115,102 @@ const PILLARS = [
       'Public-private collaboration',
     ],
     Icon: ScalesIcon,
-    delay: 240,
   },
 ] as const
 
-/* ─── ThematicAreas ──────────────────────────────────────────────────────────── */
+/* ─── Component ──────────────────────────────────────────────────────────────── */
 export default function ThematicAreas() {
-  const sectionRef                  = useRef<HTMLElement>(null)
-  const [revealed, setRevealed]     = useState(false)
-
-  useEffect(() => {
-    const el = sectionRef.current
-    if (!el) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setRevealed(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -48px 0px' }
-    )
-
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
+  /* Default: Cyber Security active. Stays on last hovered — no reset on leave. */
+  const [active, setActive] = useState(0)
+  const pillar = PILLARS[active]
 
   return (
-    <section
-      ref={sectionRef}
-      className={styles.section}
-      aria-labelledby="thematic-heading"
-    >
-      {/* Header */}
-      <header className={styles.header}>
-        <span className={styles.label}>What We Cover</span>
-        <h2 id="thematic-heading" className={styles.heading}>
-          Three Pillars of the Summit
-        </h2>
-      </header>
+    <section className={styles.section} aria-labelledby="thematic-heading">
+      <div className={styles.inner}>
 
-      {/* Cards */}
-      <div className={styles.grid} role="list">
-        {PILLARS.map(({ variant, color, number, name, topics, Icon, delay }) => (
-          <article
-            key={name}
-            role="listitem"
-            className={`${styles.card} ${variant} ${revealed ? styles.animate : ''}`}
-            style={revealed ? { animationDelay: `${delay}ms` } : undefined}
-          >
-            {/* Pillar header */}
-            <div className={styles.cardTop}>
-              <p className={styles.pillarLabel}>Pillar {number}</p>
-              <h3
-                className={styles.pillarName}
-                style={{ color }}
+        {/* Section header */}
+        <header className={styles.header}>
+          <span className={styles.sectionLabel}>Key Thematic Areas</span>
+          <h2 id="thematic-heading" className={styles.heading}>
+            Three Pillars of the Summit
+          </h2>
+        </header>
+
+        {/* Two-column layout */}
+        <div className={styles.twoCol}>
+
+          {/* ── Left column: content for active pillar ── */}
+          <div className={styles.leftCol}>
+            {/* key forces CSS animation to retrigger on every active change */}
+            <div key={active} className={styles.leftContent}>
+              <span
+                className={styles.contentLabel}
+                style={{ color: pillar.accentColor }}
               >
-                {name}
-              </h3>
+                Pillar {pillar.number}
+              </span>
+              <h3 className={styles.contentTitle}>{pillar.name}</h3>
+              <p className={styles.contentDesc}>{pillar.description}</p>
+              <ul className={styles.topicList} aria-label={`${pillar.name} sub-topics`}>
+                {pillar.topics.map(topic => (
+                  <li key={topic} className={styles.topicItem}>
+                    <span
+                      className={styles.topicDash}
+                      style={{ background: pillar.accentColor }}
+                      aria-hidden="true"
+                    />
+                    {topic}
+                  </li>
+                ))}
+              </ul>
+              <button type="button" className={styles.cta}>
+                Explore This Track{' '}
+                <span className={styles.ctaArrow} aria-hidden="true">→</span>
+              </button>
             </div>
+          </div>
 
-            {/* Sub-topics */}
-            <ul className={styles.topicList} aria-label={`${name} topics`}>
-              {topics.map((topic) => (
-                <li key={topic} className={styles.topic}>
-                  <span className={styles.topicDash} aria-hidden="true" />
-                  {topic}
-                </li>
-              ))}
-            </ul>
-
-            {/* Decorative icon */}
+          {/* ── Right column: accordion panels ── */}
+          <div className={styles.rightCol}>
             <div
-              className={styles.iconWrap}
-              style={{ color }}
-              aria-hidden="true"
+              className={styles.accordion}
+              role="list"
+              aria-label="Summit pillars"
             >
-              <Icon />
+              {PILLARS.map(({ id, number, name, variantClass }, i) => {
+                const isActive = active === i
+                return (
+                  <article
+                    key={id}
+                    className={`${styles.panel} ${variantClass} ${isActive ? styles.panelActive : ''}`}
+                    role="listitem"
+                    tabIndex={0}
+                    onMouseEnter={() => setActive(i)}
+                    onFocus={() => setActive(i)}
+                    aria-label={`Pillar ${number}: ${name}`}
+                    aria-current={isActive ? true : undefined}
+                  >
+                    {/* Background pattern */}
+                    <div className={styles.panelBg} aria-hidden="true" />
+                    {/* Gradient overlay */}
+                    <div className={styles.panelGradient} aria-hidden="true" />
+
+                    {/* Collapsed label — rotated name, hidden when active */}
+                    <div className={styles.collapsedLabel} aria-hidden="true">
+                      <span className={styles.rotatedName}>{name}</span>
+                    </div>
+
+                    {/* Ghost index number — visible only when active */}
+                    <span className={styles.ghostIndex} aria-hidden="true">
+                      {number}
+                    </span>
+                  </article>
+                )
+              })}
             </div>
-          </article>
-        ))}
+          </div>
+
+        </div>
       </div>
     </section>
   )

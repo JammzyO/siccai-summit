@@ -8,29 +8,32 @@
   isolation: isolate;
 }
 
-/* Ambient glow — purple tint far right to balance gold from hero */
 .section::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 55% 65% at 90% 50%, rgba(123, 104, 238, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 45% 45% at 10% 80%, rgba(0, 184, 212, 0.06)   0%, transparent 55%);
+    radial-gradient(ellipse 55% 65% at 90% 50%, rgba(123, 104, 238, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 45% at 10% 80%, rgba(0, 184, 212, 0.05)   0%, transparent 55%);
   pointer-events: none;
 }
 
-/* ─── Section Header ─────────────────────────────────────────────────────────── */
-.header {
+/* ─── Inner Container ─────────────────────────────────────────────────────────── */
+.inner {
   position: relative;
   z-index: 1;
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--container-pad);
-  margin-bottom: clamp(var(--space-lg), 6vw, 80px);
 }
 
-.label {
+/* ─── Section Header ─────────────────────────────────────────────────────────── */
+.header {
+  margin-bottom: clamp(var(--space-lg), 5vw, 64px);
+}
+
+.sectionLabel {
   display: inline-block;
   font-family: var(--font-body);
   font-size: 0.6875rem;
@@ -51,116 +54,76 @@
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
-/* ─── Card Grid ──────────────────────────────────────────────────────────────── */
-.grid {
-  position: relative;
-  z-index: 1;
+/* ─── Two-column layout ───────────────────────────────────────────────────────── */
+.twoCol {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-md);
-  max-width: var(--container-max);
-  margin-inline: auto;
-  padding-inline: var(--container-pad);
+  grid-template-columns: 2fr 3fr;
+  gap: clamp(var(--space-lg), 4vw, 64px);
+  align-items: stretch;
 }
 
-/* ─── Card Base ──────────────────────────────────────────────────────────────── */
-.card {
-  position: relative;
+/* ─── Left column — active pillar content ─────────────────────────────────────── */
+.leftCol {
   display: flex;
   flex-direction: column;
-  padding: var(--space-md) var(--space-md) var(--space-md);
-  background: var(--color-elevated);
-  border-top: 3px solid transparent;  /* color set by variant */
-  border-left: 1px solid var(--color-border);
-  border-right: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-
-  /* Start hidden — JS adds .animate class on section intersection */
-  opacity: 0;
-  transform: translateY(20px);
+  justify-content: center;
 }
 
-/* Animate in */
-.card.animate {
-  animation: cardFadeUp 600ms cubic-bezier(0.4, 0, 0.2, 1) both;
+@keyframes contentEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Hover lift */
-.card {
-  transition:
-    transform 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
-    box-shadow 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+.leftContent {
+  animation: contentEnter 420ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-.card:hover {
-  transform: translateY(-6px);
+.contentLabel {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-xs);
 }
 
-/* Focus-visible for keyboard nav */
-.card:focus-visible {
-  outline: 2px solid var(--color-gold);
-  outline-offset: 2px;
+.contentTitle {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.8vw, 36px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
-/* ─── Card Variants ──────────────────────────────────────────────────────────── */
-.variantGold {
-  border-top-color: var(--color-gold);
-}
-.variantGold:hover {
-  box-shadow: var(--shadow-md), 0 0 32px rgba(185, 155, 35, 0.12);
-}
-
-.variantTeal {
-  border-top-color: var(--color-teal);
-}
-.variantTeal:hover {
-  box-shadow: var(--shadow-md), 0 0 32px rgba(0, 184, 212, 0.10);
-}
-
-.variantPurple {
-  border-top-color: #7B68EE;
-}
-.variantPurple:hover {
-  box-shadow: var(--shadow-md), 0 0 32px rgba(123, 104, 238, 0.12);
-}
-
-/* ─── Card Content ───────────────────────────────────────────────────────────── */
-.cardTop {
+.contentDesc {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--color-muted);
   margin-bottom: var(--space-md);
 }
 
-.pillarLabel {
-  font-family: var(--font-body);
-  font-size: 0.625rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-  margin-bottom: 6px;
-}
-
-.pillarName {
-  font-family: var(--font-display);
-  font-size: clamp(20px, 2vw, 24px);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  font-feature-settings: "kern" 1;
-  /* color set by variant via inline style */
-}
-
-/* ─── Topic List ─────────────────────────────────────────────────────────────── */
+/* ─── Topic list ─────────────────────────────────────────────────────────────── */
 .topicList {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  flex: 1;
+  gap: 8px;
+  margin-bottom: var(--space-lg);
 }
 
-.topic {
+.topicItem {
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -175,47 +138,310 @@
   flex-shrink: 0;
   width: 10px;
   height: 1px;
-  background: currentColor;
-  opacity: 0.35;
+  opacity: 0.6;
   position: relative;
-  top: -5px;
+  top: -3px;
 }
 
-/* ─── Card Icon ──────────────────────────────────────────────────────────────── */
-.iconWrap {
+/* ─── CTA button ─────────────────────────────────────────────────────────────── */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  cursor: pointer;
+  transition: opacity 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+              transform 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.cta:hover {
+  opacity: 0.78;
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.cta:active {
+  transform: translateY(1px);
+}
+
+.ctaArrow {
+  display: inline-block;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cta:hover .ctaArrow {
+  transform: translateX(4px);
+}
+
+/* ─── Right column — accordion ────────────────────────────────────────────────── */
+.rightCol {
+  /* Bleeds to the right of the container */
+}
+
+/* ─── Accordion container ────────────────────────────────────────────────────── */
+.accordion {
   display: flex;
-  justify-content: flex-end;
-  margin-top: var(--space-md);
-  opacity: 0.1;
-  /* color inherited from variant class via JS inline style */
+  height: 480px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.iconWrap svg {
-  width: 48px;
-  height: 48px;
+/* ─── Panel base ─────────────────────────────────────────────────────────────── */
+.panel {
+  position: relative;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 48px;
+  overflow: hidden;
+  cursor: pointer;
+  border-right: 1px solid var(--color-border);
+  outline: none;
+
+  transition: flex-grow 560ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ─── Keyframes ──────────────────────────────────────────────────────────────── */
-@keyframes cardFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.panel:last-child {
+  border-right: none;
 }
 
-/* ─── Responsive ─────────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* Surface brightening via pseudo — no background-color animation */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(255, 255, 255, 0);
+  opacity: 0;
+  transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
-@media (max-width: 580px) {
-  .grid {
+.panelActive::before {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Active state — expand */
+.panelActive {
+  flex-grow: 1;
+}
+
+.panel:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -3px;
+}
+
+/* ─── Variant: top accent borders ───────────────────────────────────────────── */
+.variantGold   { border-top: 3px solid var(--color-gold); }
+.variantTeal   { border-top: 3px solid var(--color-teal); }
+.variantPurple { border-top: 3px solid #7B68EE; }
+
+/* ─── Background pattern layer ──────────────────────────────────────────────── */
+.panelBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/*
+  Cyber Security — circuit-board grid:
+  layered linear gradients produce a grid; radial gradient adds dots at nodes
+*/
+.variantGold .panelBg {
+  background-image:
+    linear-gradient(rgba(185, 155, 35, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(185, 155, 35, 0.09) 1px, transparent 1px),
+    radial-gradient(circle, rgba(185, 155, 35, 0.22) 1.5px, transparent 1.5px);
+  background-size: 60px 60px, 60px 60px, 60px 60px;
+  background-position: 0 0, 0 0, 30px 30px;
+}
+
+/*
+  Artificial Intelligence — radial dot grid
+*/
+.variantTeal .panelBg {
+  background-image:
+    radial-gradient(circle, rgba(0, 184, 212, 0.2) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+/*
+  Policy & Leadership — diagonal line pattern
+*/
+.variantPurple .panelBg {
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(123, 104, 238, 0.1) 0,
+      rgba(123, 104, 238, 0.1) 1px,
+      transparent 0,
+      transparent 50%
+    );
+  background-size: 24px 24px;
+}
+
+/* Gradient overlay — heavy at bottom, light at top */
+.panelGradient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(8, 21, 37, 0.92) 0%,
+    rgba(8, 21, 37, 0.55) 45%,
+    rgba(8, 21, 37, 0.20) 100%
+  );
+}
+
+/* ─── Ghost index number ─────────────────────────────────────────────────────── */
+.ghostIndex {
+  position: absolute;
+  bottom: -10px;
+  right: 16px;
+  font-family: var(--font-display);
+  font-size: clamp(100px, 12vw, 180px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--color-gold);
+  opacity: 0.06;
+  user-select: none;
+  pointer-events: none;
+  z-index: 2;
+
+  transform: translateY(0);
+  transition: opacity 380ms cubic-bezier(0.4, 0, 0.2, 1) 200ms;
+}
+
+/* Hide ghost on collapsed panels */
+.panel:not(.panelActive) .ghostIndex {
+  opacity: 0;
+  transition: opacity 180ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+/* ─── Collapsed label — rotated name ────────────────────────────────────────── */
+.collapsedLabel {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  opacity: 1;
+  transition: opacity 180ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.panelActive .collapsedLabel {
+  opacity: 0;
+  transition: opacity 130ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.rotatedName {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--color-text);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Dim non-active labels slightly */
+.accordion:has(.panelActive) .panel:not(.panelActive) .rotatedName {
+  opacity: 0.5;
+  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Responsive: mobile stacked layout ──────────────────────────────────────── */
+@media (max-width: 860px) {
+  .twoCol {
     grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .accordion {
+    flex-direction: column;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .panel {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 56px;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    transition: flex-basis 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .panel:last-child {
+    border-bottom: none;
+  }
+
+  .panelActive {
+    flex-grow: 0;
+    flex-basis: 320px;
+  }
+
+  /* Horizontal label on mobile */
+  .collapsedLabel {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: var(--space-md);
+  }
+
+  .rotatedName {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+  }
+
+  .ghostIndex {
+    font-size: 72px;
+  }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    transition: none;
+  }
+
+  .collapsedLabel,
+  .ghostIndex {
+    transition: none;
+  }
+
+  .leftContent {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .cta,
+  .ctaArrow {
+    transition: none;
+  }
+
+  .panel::before {
+    transition: none;
   }
 }
