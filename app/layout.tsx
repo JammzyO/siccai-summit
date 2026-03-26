@@ -34,6 +34,11 @@ export const metadata: Metadata = {
     'siccai2026',
     'continental summit',
   ],
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
   openGraph: {
     title: 'SICC AI Continental Summit on Cybersecurity & AI — Cape Town 2026',
     description:
