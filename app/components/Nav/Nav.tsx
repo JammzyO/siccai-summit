@@ -76,18 +76,25 @@ export default function Nav() {
   const navRef = useRef<HTMLElement>(null)
 
   const handleScroll = useCallback(() => {
-    const y = window.scrollY
-    setScrolled(y > 80)
-
-    // Highlight CTA after scrolling past ~100vh (hero section)
-    const heroHeight = window.innerHeight
-    setCtaHighlight(y > heroHeight * 0.8)
+    setScrolled(window.scrollY > 80)
   }, [])
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [handleScroll])
+
+  /* Highlight CTA once hero section leaves viewport */
+  useEffect(() => {
+    const hero = document.getElementById('hero')
+    if (!hero) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setCtaHighlight(!entry.isIntersecting),
+      { threshold: 0 }
+    )
+    obs.observe(hero)
+    return () => obs.disconnect()
+  }, [])
 
   // Close mobile menu on resize above breakpoint
   useEffect(() => {

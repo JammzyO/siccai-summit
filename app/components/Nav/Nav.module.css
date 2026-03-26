@@ -119,8 +119,8 @@
   white-space: nowrap;
 
   transition:
-    background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
-    color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    background 300ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    color 300ms cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
 .cta:hover {

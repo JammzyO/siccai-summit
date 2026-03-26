@@ -52,29 +52,14 @@ const FORMAT_ITEMS = [
   },
 ] as const
 
+/* ─── Ticker rows ────────────────────────────────────────────────────────────── */
+const ROW1 = [...DELEGATES]
+const ROW2 = [...DELEGATES].slice().reverse()
+
 /* ─── Component ──────────────────────────────────────────────────────────────── */
 export default function DelegatesFormat() {
-  const tagsRef                        = useRef<HTMLUListElement>(null)
   const formatRef                      = useRef<HTMLDivElement>(null)
-  const [tagsRevealed, setTagsRevealed] = useState(false)
   const [fmtRevealed,  setFmtRevealed]  = useState(false)
-
-  /* Tag cloud observer */
-  useEffect(() => {
-    const el = tagsRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTagsRevealed(true)
-          obs.disconnect()
-        }
-      },
-      { threshold: 0.2, rootMargin: '0px 0px -48px 0px' }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
 
   /* Format grid observer */
   useEffect(() => {
@@ -106,22 +91,32 @@ export default function DelegatesFormat() {
             </h2>
           </header>
 
-          <ul
-            ref={tagsRef}
-            className={styles.tagCloud}
-            aria-label="Intended delegate types"
-          >
-            {DELEGATES.map((label, i) => (
-              <li
-                key={label}
-                className={`${styles.pill} ${tagsRevealed ? styles.animate : ''}`}
-                style={tagsRevealed ? { animationDelay: `${i * 20}ms` } : undefined}
-              >
-                <span className={styles.pillAccent} aria-hidden="true" />
-                {label}
-              </li>
-            ))}
+          {/* Accessible list for screen readers */}
+          <ul className={styles.srOnly} aria-label="Intended delegate types">
+            {DELEGATES.map(label => <li key={label}>{label}</li>)}
           </ul>
+
+          {/* Infinite ticker — decorative, aria-hidden */}
+          <div className={styles.tickerWrap} aria-hidden="true">
+            <div className={styles.tickerMask}>
+              <div className={`${styles.tickerRow} ${styles.tickerRowLeft}`}>
+                {[...ROW1, ...ROW1].map((label, i) => (
+                  <span key={`r1-${i}`} className={styles.tickerPill}>
+                    <span className={styles.pillDot} />
+                    {label}
+                  </span>
+                ))}
+              </div>
+              <div className={`${styles.tickerRow} ${styles.tickerRowRight}`}>
+                {[...ROW2, ...ROW2].map((label, i) => (
+                  <span key={`r2-${i}`} className={styles.tickerPill}>
+                    <span className={styles.pillDot} />
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ── Divider ── */}

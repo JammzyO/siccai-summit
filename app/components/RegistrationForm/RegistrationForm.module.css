@@ -125,11 +125,21 @@
   height: 1px;
   background: var(--color-border);
   margin-inline: 8px;
-  transition: background 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
-.progressLineFilled {
+.progressLine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: var(--color-gold);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressLineFilled::after {
+  transform: scaleX(1);
 }
 
 @media (min-width: 480px) {
@@ -138,25 +148,57 @@
 
 /* ─── Step track & steps ─────────────────────────────────────────────────────── */
 .stepOuter {
+  position: relative;
   overflow: hidden;
 }
 
-.track {
-  display: flex;
-  width: 300%;
-  transition: transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
+/* Active step — sets container height */
+.stepActive {
+  position: relative;
+  width: 100%;
 }
 
-.step {
-  width: 33.3334%;
-  flex-shrink: 0;
-}
-
-/* Block interaction with inactive steps */
-.step[aria-hidden="true"] {
+/* Exiting step — floats over active, animated away */
+.stepExiting {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   pointer-events: none;
   user-select: none;
-  visibility: hidden;  /* keeps layout but stops focus */
+}
+
+/* Forward: enters from right, exits to left */
+.stepActive[data-dir="fwd"]  { animation: enterFwd 350ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+.stepExiting[data-dir="fwd"] { animation: exitFwd  350ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+/* Backward: enters from left, exits to right */
+.stepActive[data-dir="bwd"]  { animation: enterBwd 350ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+.stepExiting[data-dir="bwd"] { animation: exitBwd  350ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+@keyframes enterFwd {
+  from { opacity: 0; transform: translateX(40px);  }
+  to   { opacity: 1; transform: translateX(0);      }
+}
+@keyframes exitFwd {
+  from { opacity: 1; transform: translateX(0);      }
+  to   { opacity: 0; transform: translateX(-40px);  }
+}
+@keyframes enterBwd {
+  from { opacity: 0; transform: translateX(-40px);  }
+  to   { opacity: 1; transform: translateX(0);      }
+}
+@keyframes exitBwd {
+  from { opacity: 1; transform: translateX(0);      }
+  to   { opacity: 0; transform: translateX(40px);   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stepActive, .stepExiting {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .stepTitle {

@@ -43,7 +43,7 @@ function ScrollIndicator() {
 /* ─── Hero ───────────────────────────────────────────────────────────────────── */
 export default function Hero() {
   return (
-    <section className={styles.hero} aria-label="Summit hero">
+    <section id="hero" className={styles.hero} aria-label="Summit hero">
       <div className={styles.inner}>
 
         {/* Eyebrow */}

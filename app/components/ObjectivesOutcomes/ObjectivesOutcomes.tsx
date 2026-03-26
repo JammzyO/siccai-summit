@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import styles from './ObjectivesOutcomes.module.css'
 
 /* ─── Data — verbatim from PDF ───────────────────────────────────────────────── */
@@ -48,6 +48,28 @@ export default function ObjectivesOutcomes() {
 
   const [objRevealed, setObjRevealed]   = useState(false)
   const [outRevealed, setOutRevealed]   = useState(false)
+  const [counts, setCounts]             = useState<number[]>(
+    new Array(OBJECTIVES.length).fill(0)
+  )
+
+  /* Count-up animation when objectives enter view */
+  const startCountUp = useCallback(() => {
+    const duration  = 800   // ms total
+    const targets   = OBJECTIVES.map((_, i) => i + 1)
+    const startTime = performance.now()
+
+    function easeOutCubic(t: number) { return 1 - Math.pow(1 - t, 3) }
+
+    function tick(now: number) {
+      const elapsed  = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased    = easeOutCubic(progress)
+      setCounts(targets.map(t => Math.round(eased * t)))
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+
+    requestAnimationFrame(tick)
+  }, [])
 
   /* Objectives observer */
   useEffect(() => {
@@ -57,6 +79,7 @@ export default function ObjectivesOutcomes() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setObjRevealed(true)
+          startCountUp()
           obs.disconnect()
         }
       },
@@ -64,7 +87,7 @@ export default function ObjectivesOutcomes() {
     )
     obs.observe(el)
     return () => obs.disconnect()
-  }, [])
+  }, [startCountUp])
 
   /* Outcomes observer */
   useEffect(() => {
@@ -122,10 +145,10 @@ export default function ObjectivesOutcomes() {
           aria-label="Summit objectives"
         >
           {OBJECTIVES.map((text, i) => {
-            const num = String(i + 1).padStart(2, '0')
+            const num = String(counts[i]).padStart(2, '0')
             return (
               <li
-                key={num}
+                key={i}
                 className={`${styles.objectiveItem} ${objRevealed ? styles.animate : ''}`}
                 style={objRevealed ? { animationDelay: `${i * OBJ_STAGGER}ms` } : undefined}
               >
