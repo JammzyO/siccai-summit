@@ -152,6 +152,10 @@ export default function ThematicAreas() {
               ))}
             </ul>
             <div className={styles.ctaRow}>
+              <a href="#form-heading" className={styles.ctaRegister}>
+                Register Now{' '}
+                <span className={styles.ctaArrow} aria-hidden="true">→</span>
+              </a>
               <a
                 href="/siccai-cape-town-summit-brochure.pdf"
                 target="_blank"
@@ -160,10 +164,6 @@ export default function ThematicAreas() {
               >
                 Download Programme{' '}
                 <span className={styles.ctaArrow} aria-hidden="true">↓</span>
-              </a>
-              <a href="#form-heading" className={styles.ctaRegister}>
-                Register Now{' '}
-                <span className={styles.ctaArrow} aria-hidden="true">→</span>
               </a>
             </div>
           </div>
