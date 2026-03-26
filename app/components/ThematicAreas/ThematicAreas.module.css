@@ -14,8 +14,8 @@
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 55% 65% at 90% 50%, rgba(123, 104, 238, 0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 45% 45% at 10% 80%, rgba(0, 184, 212, 0.05)   0%, transparent 55%);
+    radial-gradient(ellipse 55% 65% at 90% 50%, rgba(212, 132, 90, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 45% at 10% 80%, rgba(0, 184, 212, 0.05)  0%, transparent 55%);
   pointer-events: none;
 }
 
@@ -196,7 +196,7 @@
 /* ─── Variant: top accent borders ───────────────────────────────────────────── */
 .variantGold   { border-top: 3px solid var(--color-gold); }
 .variantTeal   { border-top: 3px solid var(--color-teal); }
-.variantPurple { border-top: 3px solid #7B68EE; }
+.variantPurple { border-top: 3px solid #D4845A; }
 
 /* ─── Background pattern layer ──────────────────────────────────────────────── */
 .panelBg {
@@ -235,13 +235,13 @@
   background-image:
     repeating-linear-gradient(
       -45deg,
-      rgba(123, 104, 238, 0.1) 0,
-      rgba(123, 104, 238, 0.1) 1px,
+      rgba(212, 132, 90, 0.1) 0,
+      rgba(212, 132, 90, 0.1) 1px,
       transparent 0,
       transparent 50%
     );
   background-size: 24px 24px;
-  background-color: rgba(8, 16, 34, 0.97);
+  background-color: rgba(18, 14, 10, 0.97);
 }
 
 /* ─── Gradient overlay — heavy at bottom ────────────────────────────────────── */

@@ -101,7 +101,7 @@ const PILLARS = [
     id:           'policy',
     number:       '03',
     name:         'Policy & Leadership',
-    accentColor:  '#9B8FEE',
+    accentColor:  '#D4845A',
     variantClass: styles.variantPurple,
     description:
       'Cyber risk is no longer an IT issue — it sits at the board table. This pillar ' +
