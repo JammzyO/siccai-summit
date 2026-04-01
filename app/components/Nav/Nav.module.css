@@ -1,4 +1,4 @@
-/* ─── Nav Shell ──────────────────────────────────────────────────────────────── */
+/* ─── Nav shell ──────────────────────────────────────────────────────────────── */
 .nav {
   position: fixed;
   top: 0;
@@ -6,13 +6,10 @@
   right: 0;
   z-index: 900;
   height: 72px;
-
-  /* Transparent at top — JS adds .scrolled class */
   background: transparent;
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
   border-bottom: 1px solid transparent;
-
   transition:
     background 300ms cubic-bezier(0.4, 0, 0.2, 1),
     backdrop-filter 300ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -21,16 +18,17 @@
 }
 
 .nav.scrolled {
-  background: rgba(20, 65, 105, 0.97);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom-color: var(--color-border);
+  background: rgba(8, 18, 34, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom-color: rgba(185, 155, 35, 0.12);
 }
 
-/* ─── Inner layout ───────────────────────────────────────────────────────────── */
+/* ─── Inner grid ─────────────────────────────────────────────────────────────── */
+/* logo | links | countdown | cta */
 .inner {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
   height: 100%;
   max-width: var(--container-max);
@@ -43,7 +41,6 @@
 .logoWrap {
   display: flex;
   align-items: center;
-  justify-self: start;
 }
 
 .logoWrap a {
@@ -51,12 +48,80 @@
   line-height: 0;
 }
 
+/* ─── Desktop nav links ──────────────────────────────────────────────────────── */
+.links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-left: var(--space-md);
+}
+
+.link {
+  display: inline-block;
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: rgba(200, 215, 230, 0.7);
+  text-decoration: none;
+  position: relative;
+  white-space: nowrap;
+  transition: color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+/* Underline bar */
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: var(--color-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link:hover {
+  color: var(--color-text);
+}
+
+.link:hover::after {
+  transform: scaleX(1);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+.link:active {
+  opacity: 0.8;
+}
+
+.linkActive {
+  color: var(--color-gold);
+}
+
+.linkActive::after {
+  transform: scaleX(1);
+}
+
 /* ─── Countdown ──────────────────────────────────────────────────────────────── */
+.countdownWrap {
+  display: flex;
+  align-items: center;
+}
+
 .countdown {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  justify-self: center;
+  gap: 6px;
 }
 
 .countUnit {
@@ -64,12 +129,12 @@
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  min-width: 36px;
+  min-width: 30px;
 }
 
 .countNum {
   font-family: var(--font-body);
-  font-size: 1.125rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1;
   color: var(--color-gold);
@@ -79,7 +144,7 @@
 
 .countLabel {
   font-family: var(--font-body);
-  font-size: 0.625rem;
+  font-size: 0.5rem;
   font-weight: 400;
   line-height: 1;
   color: var(--color-muted);
@@ -87,12 +152,12 @@
   letter-spacing: 0.1em;
 }
 
-.countDivider {
+.countSep {
   color: var(--color-gold-dim);
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 300;
   align-self: flex-start;
-  padding-top: 2px;
+  padding-top: 1px;
   user-select: none;
 }
 
@@ -100,13 +165,12 @@
 .ctaWrap {
   display: flex;
   align-items: center;
-  justify-self: end;
 }
 
 .cta {
   display: inline-flex;
   align-items: center;
-  padding: 10px 24px;
+  padding: 9px 22px;
   font-family: var(--font-body);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -117,10 +181,11 @@
   border: 1px solid var(--color-gold);
   cursor: pointer;
   white-space: nowrap;
-
+  text-decoration: none;
   transition:
-    background 300ms cubic-bezier(0.0, 0.0, 0.2, 1),
-    color 300ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    color 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
 .cta:hover {
@@ -137,13 +202,14 @@
   transform: translateY(1px);
 }
 
-/* Highlighted state — triggered after scrolling past hero (JS adds .ctaHighlight) */
+/* Fills solid once past hero */
 .nav.ctaHighlight .cta {
   background: var(--color-gold);
   color: var(--color-bg);
+  box-shadow: 0 2px 16px rgba(185, 155, 35, 0.3);
 }
 
-/* ─── Mobile hamburger ───────────────────────────────────────────────────────── */
+/* ─── Hamburger ──────────────────────────────────────────────────────────────── */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -167,16 +233,14 @@
     opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.hamburger.open span:nth-child(1) {
-  transform: translateY(6.5px) rotate(45deg);
+.hamburger:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
 }
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
-}
-.hamburger.open span:nth-child(3) {
-  transform: translateY(-6.5px) rotate(-45deg);
-}
+
+.hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
 /* ─── Mobile drawer ──────────────────────────────────────────────────────────── */
 .mobileMenu {
@@ -185,13 +249,12 @@
   top: 72px;
   left: 0;
   right: 0;
-  background: rgba(20, 65, 105, 0.99);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--space-md) var(--container-pad) var(--space-lg);
+  background: rgba(8, 18, 34, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(185, 155, 35, 0.12);
+  padding: var(--space-md) var(--container-pad) var(--space-xl);
   z-index: 899;
-
   opacity: 0;
   transform: translateY(-8px);
   pointer-events: none;
@@ -206,38 +269,84 @@
   pointer-events: auto;
 }
 
+/* Mobile nav list */
+.mobileLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobileLink {
+  display: block;
+  padding: 14px 4px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: rgba(200, 215, 230, 0.75);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(185, 155, 35, 0.08);
+  transition: color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+.mobileLink:hover,
+.mobileLink:focus-visible {
+  color: var(--color-text);
+}
+
+.mobileLink:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.mobileLinkActive {
+  color: var(--color-gold);
+}
+
+/* Divider between links and countdown */
+.mobileDivider {
+  height: 1px;
+  background: rgba(185, 155, 35, 0.1);
+  margin-block: var(--space-md);
+}
+
+/* Mobile countdown */
 .mobileCountdown {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-sm);
-  padding-top: var(--space-sm);
+  gap: 8px;
+  margin-bottom: var(--space-md);
 }
 
+/* Mobile CTA */
 .mobileCta {
   display: block;
   width: 100%;
-  margin-top: var(--space-md);
-  padding: 14px 24px;
+  padding: 15px 24px;
   font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.9375rem;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-gold);
-  background: transparent;
+  color: var(--color-bg);
+  background: var(--color-gold);
   border: 1px solid var(--color-gold);
   text-align: center;
   cursor: pointer;
+  text-decoration: none;
   transition:
     background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
-    color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+    box-shadow 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
 .mobileCta:hover,
 .mobileCta:focus-visible {
-  background: var(--color-gold);
-  color: var(--color-bg);
+  background: #C9AC33;
+  box-shadow: 0 4px 20px rgba(185, 155, 35, 0.3);
 }
 
 .mobileCta:focus-visible {
@@ -245,26 +354,49 @@
   outline-offset: 3px;
 }
 
-/* ─── Responsive breakpoints ─────────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  /* Hide desktop countdown and CTA in inner grid */
-  .countdown,
+/* Backdrop overlay */
+.backdrop {
+  display: none;
+  position: fixed;
+  inset: 72px 0 0 0;
+  background: rgba(8, 18, 34, 0.5);
+  z-index: 898;
+  cursor: pointer;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Collapse links and countdown, show hamburger */
+  .links,
+  .countdownWrap,
   .ctaWrap {
     display: none;
   }
 
-  /* Reconfigure grid: logo left, hamburger right */
   .inner {
     grid-template-columns: auto 1fr auto;
   }
 
   .hamburger {
     display: flex;
-    grid-column: 3;
   }
 
-  /* Show mobile drawer */
   .mobileMenu {
     display: block;
+  }
+
+  .backdrop {
+    display: block;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 901px) {
+  /* Drop countdown on mid-range screens, keep links + CTA */
+  .countdownWrap {
+    display: none;
+  }
+
+  .inner {
+    grid-template-columns: auto 1fr auto;
   }
 }

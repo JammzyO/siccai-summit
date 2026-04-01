@@ -123,7 +123,7 @@ export default function ThematicAreas() {
   const [active, setActive] = useState(0)
 
   return (
-    <section className={styles.section} aria-labelledby="thematic-heading">
+    <section id="programme" className={styles.section} aria-labelledby="thematic-heading">
       <div className={styles.inner}>
         <div className={styles.twoCol}>
 

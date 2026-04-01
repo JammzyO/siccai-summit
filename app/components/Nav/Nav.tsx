@@ -5,34 +5,32 @@ import Image from 'next/image'
 import Link from 'next/link'
 import styles from './Nav.module.css'
 
-/* ─── Types ──────────────────────────────────────────────────────────────────── */
-interface TimeLeft {
-  days: number
-  hours: number
-  minutes: number
-  seconds: number
-}
+/* ─── Nav links ──────────────────────────────────────────────────────────────── */
+const NAV_LINKS = [
+  { label: 'Overview',    href: '#overview'     },
+  { label: 'Programme',   href: '#programme'    },
+  { label: 'Why Attend',  href: '#credibility'  },
+  { label: 'Pricing',     href: '#pricing'      },
+]
 
-/* ─── Summit target date ─────────────────────────────────────────────────────── */
-const SUMMIT_DATE = new Date('2026-05-11T09:00:00+02:00') // SAST (UTC+2)
+/* ─── Countdown ──────────────────────────────────────────────────────────────── */
+const SUMMIT_DATE = new Date('2026-05-11T09:00:00+02:00')
 
-function getTimeLeft(): TimeLeft {
+function getTimeLeft() {
   const diff = SUMMIT_DATE.getTime() - Date.now()
   if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 }
-  const days    = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-  return { days, hours, minutes, seconds }
+  return {
+    days:    Math.floor(diff / 86400000),
+    hours:   Math.floor((diff % 86400000) / 3600000),
+    minutes: Math.floor((diff % 3600000) / 60000),
+    seconds: Math.floor((diff % 60000) / 1000),
+  }
 }
 
-function pad(n: number): string {
-  return String(n).padStart(2, '0')
-}
+function pad(n: number) { return String(n).padStart(2, '0') }
 
-/* ─── Countdown atom ─────────────────────────────────────────────────────────── */
-function CountdownDisplay({ compact = false }: { compact?: boolean }) {
-  const [time, setTime] = useState<TimeLeft | null>(null)
+function Countdown({ compact = false }: { compact?: boolean }) {
+  const [time, setTime] = useState<ReturnType<typeof getTimeLeft> | null>(null)
 
   useEffect(() => {
     setTime(getTimeLeft())
@@ -40,19 +38,21 @@ function CountdownDisplay({ compact = false }: { compact?: boolean }) {
     return () => clearInterval(id)
   }, [])
 
-  if (!time) return null // avoid hydration mismatch
+  if (!time) return null
 
   const units = [
-    { value: time.days,    label: 'Days'    },
-    { value: time.hours,   label: 'Hours'   },
-    { value: time.minutes, label: 'Mins'    },
-    { value: time.seconds, label: 'Secs'    },
+    { value: time.days,    label: 'Days' },
+    { value: time.hours,   label: 'Hrs'  },
+    { value: time.minutes, label: 'Min'  },
+    { value: time.seconds, label: 'Sec'  },
   ]
 
-  const wrapClass = compact ? styles.mobileCountdown : styles.countdown
-
   return (
-    <div className={wrapClass} role="timer" aria-label="Time until summit">
+    <div
+      className={compact ? styles.mobileCountdown : styles.countdown}
+      role="timer"
+      aria-label="Time until summit"
+    >
       {units.map((u, i) => (
         <div key={u.label} style={{ display: 'contents' }}>
           <div className={styles.countUnit}>
@@ -60,7 +60,7 @@ function CountdownDisplay({ compact = false }: { compact?: boolean }) {
             <span className={styles.countLabel}>{u.label}</span>
           </div>
           {i < units.length - 1 && (
-            <span className={styles.countDivider} aria-hidden="true">:</span>
+            <span className={styles.countSep} aria-hidden="true">:</span>
           )}
         </div>
       ))}
@@ -68,13 +68,25 @@ function CountdownDisplay({ compact = false }: { compact?: boolean }) {
   )
 }
 
+/* ─── Smooth-scroll helper ───────────────────────────────────────────────────── */
+function scrollTo(href: string, closeMenu?: () => void) {
+  if (!href.startsWith('#')) return
+  const el = document.querySelector(href)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    closeMenu?.()
+  }
+}
+
 /* ─── Nav ────────────────────────────────────────────────────────────────────── */
 export default function Nav() {
-  const [scrolled, setScrolled]       = useState(false)
-  const [ctaHighlight, setCtaHighlight] = useState(false)
-  const [menuOpen, setMenuOpen]       = useState(false)
+  const [scrolled,      setScrolled]      = useState(false)
+  const [ctaHighlight,  setCtaHighlight]  = useState(false)
+  const [menuOpen,      setMenuOpen]      = useState(false)
+  const [activeSection, setActiveSection] = useState('')
   const navRef = useRef<HTMLElement>(null)
 
+  /* Scroll state */
   const handleScroll = useCallback(() => {
     setScrolled(window.scrollY > 80)
   }, [])
@@ -84,31 +96,56 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [handleScroll])
 
-  /* Highlight CTA once hero section leaves viewport */
+  /* Highlight CTA after hero leaves viewport */
   useEffect(() => {
     const hero = document.getElementById('hero')
     if (!hero) return
     const obs = new IntersectionObserver(
-      ([entry]) => setCtaHighlight(!entry.isIntersecting),
+      ([e]) => setCtaHighlight(!e.isIntersecting),
       { threshold: 0 }
     )
     obs.observe(hero)
     return () => obs.disconnect()
   }, [])
 
-  // Close mobile menu on resize above breakpoint
+  /* Active section tracker */
   useEffect(() => {
-    const onResize = () => {
-      if (window.innerWidth > 768) setMenuOpen(false)
-    }
+    const ids = ['hero', 'overview', 'programme', 'credibility', 'pricing', 'register']
+    const observers: IntersectionObserver[] = []
+
+    ids.forEach(id => {
+      const el = document.getElementById(id)
+      if (!el) return
+      const obs = new IntersectionObserver(
+        ([e]) => { if (e.isIntersecting) setActiveSection(id) },
+        { rootMargin: '-40% 0px -55% 0px' }
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
+
+    return () => observers.forEach(o => o.disconnect())
+  }, [])
+
+  /* Close menu on resize */
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth > 900) setMenuOpen(false) }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
+  /* Lock body scroll when mobile menu is open */
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
+  const close = () => setMenuOpen(false)
+
   const navClass = [
     styles.nav,
-    scrolled      ? styles.scrolled     : '',
-    ctaHighlight  ? styles.ctaHighlight  : '',
+    scrolled     ? styles.scrolled    : '',
+    ctaHighlight ? styles.ctaHighlight : '',
   ].filter(Boolean).join(' ')
 
   return (
@@ -116,36 +153,57 @@ export default function Nav() {
       <nav ref={navRef} className={navClass} aria-label="Primary navigation">
         <div className={styles.inner}>
 
-          {/* ── Logo ── */}
+          {/* Logo */}
           <div className={styles.logoWrap}>
-            <Link href="/" aria-label="SICC AI — home">
+            <Link href="/" aria-label="SICC AI — home" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <Image
                 src="/logo.png"
                 alt="SICC AI"
                 width={341}
                 height={356}
-                style={{ height: '44px', width: 'auto' }}
+                style={{ height: '40px', width: 'auto' }}
                 priority
               />
             </Link>
           </div>
 
-          {/* ── Countdown (desktop) ── */}
-          <CountdownDisplay />
+          {/* Desktop links */}
+          <ul className={styles.links} role="list">
+            {NAV_LINKS.map(({ label, href }) => {
+              const sectionId = href.slice(1)
+              const isActive = activeSection === sectionId
+              return (
+                <li key={href}>
+                  <a
+                    href={href}
+                    className={`${styles.link} ${isActive ? styles.linkActive : ''}`}
+                    onClick={e => { e.preventDefault(); scrollTo(href) }}
+                    aria-current={isActive ? 'location' : undefined}
+                  >
+                    {label}
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
 
-          {/* ── CTA + hamburger ── */}
+          {/* Countdown — desktop */}
+          <div className={styles.countdownWrap}>
+            <Countdown />
+          </div>
+
+          {/* CTA */}
           <div className={styles.ctaWrap}>
             <a
-              href="https://www.siccai.org/south-africa-summit-registration/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#register"
               className={styles.cta}
+              onClick={e => { e.preventDefault(); scrollTo('#register') }}
             >
               Register Now
             </a>
           </div>
 
-          {/* ── Hamburger (mobile only) ── */}
+          {/* Hamburger */}
           <button
             className={`${styles.hamburger} ${menuOpen ? styles.open : ''}`}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -161,23 +219,47 @@ export default function Nav() {
         </div>
       </nav>
 
-      {/* ── Mobile drawer ── */}
+      {/* Mobile drawer */}
       <div
         id="mobile-nav"
         className={`${styles.mobileMenu} ${menuOpen ? styles.open : ''}`}
         aria-hidden={!menuOpen}
       >
-        <CountdownDisplay compact />
+        <ul className={styles.mobileLinks} role="list">
+          {NAV_LINKS.map(({ label, href }) => {
+            const sectionId = href.slice(1)
+            const isActive = activeSection === sectionId
+            return (
+              <li key={href}>
+                <a
+                  href={href}
+                  className={`${styles.mobileLink} ${isActive ? styles.mobileLinkActive : ''}`}
+                  onClick={e => { e.preventDefault(); scrollTo(href, close) }}
+                  aria-current={isActive ? 'location' : undefined}
+                >
+                  {label}
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+
+        <div className={styles.mobileDivider} aria-hidden="true" />
+        <Countdown compact />
+
         <a
-          href="https://www.siccai.org/south-africa-summit-registration/"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#register"
           className={styles.mobileCta}
-          onClick={() => setMenuOpen(false)}
+          onClick={e => { e.preventDefault(); scrollTo('#register', close) }}
         >
-          Register Now
+          Reserve My Seat
         </a>
       </div>
+
+      {/* Backdrop */}
+      {menuOpen && (
+        <div className={styles.backdrop} onClick={close} aria-hidden="true" />
+      )}
     </>
   )
 }

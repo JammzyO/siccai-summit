@@ -52,18 +52,27 @@
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
+/* ─── Section sub-heading ────────────────────────────────────────────────────── */
+.subHeading {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--color-muted);
+  margin-top: var(--space-sm);
+}
+
 /* ─── Card grid ──────────────────────────────────────────────────────────────── */
 .grid {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: stretch;         /* stretch so featured card can bleed outside */
+  grid-template-columns: repeat(4, 1fr);
+  align-items: stretch;
   gap: var(--space-sm);
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--container-pad);
-  /* Extra vertical room so featured card's margin-block doesn't get clipped */
   padding-block: 20px;
 }
 
@@ -110,12 +119,7 @@
   box-shadow: var(--shadow-lg), var(--shadow-gold);
 }
 
-/* ─── "Most Popular" corner ribbon ──────────────────────────────────────────── */
-/*
-  Technique: absolutely positioned element, 90×90 clip box in card corner.
-  The ribbon itself is wider than the box; transform: rotate(45deg) angles it.
-  overflow: hidden on .card clips the excess.
-*/
+/* ─── Corner ribbon ──────────────────────────────────────────────────────────── */
 .ribbon {
   position: absolute;
   top: 0;
@@ -126,12 +130,11 @@
   pointer-events: none;
 }
 
-.ribbon::before {
-  content: 'Most Popular';
+.ribbon span {
   position: absolute;
   top: 20px;
-  right: -22px;
-  width: 96px;
+  right: -24px;
+  width: 100px;
   padding: 5px 0;
   background: var(--color-gold);
   color: var(--color-bg);
@@ -143,16 +146,38 @@
   text-align: center;
   transform: rotate(45deg);
   transform-origin: center;
+  display: block;
 }
 
-/* ─── Tier label ─────────────────────────────────────────────────────────────── */
+/* ─── Tier top row (label + seats badge) ────────────────────────────────────── */
+.tierTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: var(--space-md);
+}
+
 .tierLabel {
   font-family: var(--font-body);
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  margin-bottom: var(--space-md);
+  color: var(--color-gold);
+}
+
+.tierSeats {
+  font-family: var(--font-body);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  border: 1px solid rgba(185, 155, 35, 0.2);
+  padding: 3px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ─── Price block ────────────────────────────────────────────────────────────── */
@@ -182,13 +207,23 @@
   font-feature-settings: "tnum" 1;
 }
 
-.dateRange {
+.priceContact {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 3.5vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.priceNote {
   font-family: var(--font-body);
   font-size: 0.75rem;
-  font-weight: 400;
+  font-weight: 300;
   color: var(--color-muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   margin-bottom: var(--space-md);
+  line-height: 1.4;
 }
 
 /* ─── Divider ────────────────────────────────────────────────────────────────── */
@@ -229,6 +264,31 @@
   background: currentColor;
   opacity: 0.5;
   margin-top: 5px;
+}
+
+/* ─── Bonus badge ────────────────────────────────────────────────────────────── */
+.bonus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-gold);
+  background: rgba(185, 155, 35, 0.07);
+  border: 1px solid rgba(185, 155, 35, 0.2);
+  padding: 7px 10px;
+  margin-bottom: var(--space-md);
+}
+
+.bonusDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(185, 155, 35, 0.5);
 }
 
 /* ─── CTA buttons ────────────────────────────────────────────────────────────── */
@@ -326,6 +386,58 @@
   box-shadow: 0 4px 20px rgba(0, 184, 212, 0.3);
 }
 
+/* ─── Clarity Guarantee ──────────────────────────────────────────────────────── */
+.guarantee {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+  margin-top: clamp(var(--space-lg), 4vw, 56px);
+}
+
+.guarantee > div:last-child {
+  padding: var(--space-md);
+  border: 1px solid rgba(185, 155, 35, 0.25);
+  background: rgba(185, 155, 35, 0.04);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guaranteeIcon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(185, 155, 35, 0.25);
+  background: rgba(185, 155, 35, 0.06);
+  margin-top: var(--space-md); /* aligns with box top */
+}
+
+.guaranteeTitle {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.guaranteeBody {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--color-muted);
+}
+
 /* ─── Small print ────────────────────────────────────────────────────────────── */
 .footnote {
   position: relative;
@@ -366,7 +478,22 @@
 }
 
 /* ─── Responsive ─────────────────────────────────────────────────────────────── */
-@media (max-width: 860px) {
+
+/* 4 → 2 at medium */
+@media (max-width: 1024px) and (min-width: 641px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding-block: 0;
+  }
+
+  .cardFeatured {
+    margin-block: 0;
+    padding-block: var(--space-md);
+  }
+}
+
+/* 2 → 1 at small */
+@media (max-width: 640px) {
   .grid {
     grid-template-columns: 1fr;
     max-width: 480px;
@@ -376,5 +503,13 @@
   .cardFeatured {
     margin-block: 0;
     padding-block: var(--space-md);
+  }
+
+  .guarantee {
+    flex-direction: column;
+  }
+
+  .guaranteeIcon {
+    margin-top: 0;
   }
 }

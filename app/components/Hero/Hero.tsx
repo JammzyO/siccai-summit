@@ -52,53 +52,74 @@ export default function Hero() {
           <span className={styles.eyebrowDot} aria-hidden="true" />
           11–15 May 2026
           <span className={styles.eyebrowDot} aria-hidden="true" />
-          The Bay Hotel
+          Summit Training
         </p>
 
         {/* Headline */}
         <h1 className={styles.headline}>
-          The Continental Summit on Cybersecurity{' '}
-          <span className={styles.headlineAccent}>&amp; AI</span> for Executives
+          African Cybersecurity{' '}
+          <span className={styles.headlineAccent}>&amp; AI</span>{' '}
+          Summit Training
         </h1>
 
-        {/* Subheadline — verbatim from PDF Summit Overview */}
+        {/* Positioning statement */}
         <p className={styles.sub}>
-          A high-impact, pan-African capacity-building forum designed to strengthen
-          cyber resilience, responsible AI adoption, and leadership awareness across
-          governments, businesses, and institutions.
+          Executive-level training for leaders who must protect services and adopt
+          AI safely—without slowing innovation.
         </p>
+
+        {/* Sub-headline */}
+        <p className={styles.subAlt}>
+          Built for CEOs, Directors, Regional Leaders and Policy Makers across
+          COMESA, SADC and AU member states. Leave with a practical
+          Cybersecurity + Responsible AI governance playbook you can apply immediately.
+        </p>
+
+        {/* Who it is for / not for */}
+        <div className={styles.qualifier} role="note" aria-label="Audience qualifier">
+          <span className={styles.qualifierFor}>
+            <span className={styles.qualifierLabel}>For:</span>
+            CEOs · Directors · Policy Makers · Regulators · Board Members
+          </span>
+          <span className={styles.qualifierSep} aria-hidden="true" />
+          <span className={styles.qualifierNot}>
+            <span className={styles.qualifierLabel}>Not for:</span>
+            Entry-level ICT training
+          </span>
+        </div>
+
+        {/* 3 Outcome bullets */}
+        <ul className={styles.outcomes} aria-label="Key outcomes">
+          {[
+            { label: 'Availability', desc: 'Services stay up. Disruption risk reduced.' },
+            { label: 'Integrity',    desc: 'Systems stay trusted. Insider threats controlled.' },
+            { label: 'Confidentiality + AI Safety', desc: 'Data protected. AI adopted responsibly.' },
+          ].map(({ label, desc }) => (
+            <li key={label} className={styles.outcomesItem}>
+              <span className={styles.outcomesDot} aria-hidden="true" />
+              <span>
+                <strong className={styles.outcomesLabel}>{label}</strong>
+                {' — '}
+                <span className={styles.outcomesDesc}>{desc}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
 
         {/* CTAs */}
         <div className={styles.ctaRow}>
           <a
-            href="https://www.siccai.org/south-africa-summit-registration/"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#register"
             className={styles.ctaPrimary}
           >
-            Secure Your Seat
+            Reserve My Seat — USD 3,000
           </a>
           <a
-            href="/siccai-cape-town-summit-brochure.pdf"
-            download="SICCAI-Cape-Town-Summit-2026.pdf"
+            href="#register"
             className={styles.ctaSecondary}
           >
-            <svg
-              className={styles.downloadIcon}
-              viewBox="0 0 14 14"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                d="M7 1v8M3 6l4 4 4-4M1 11h12"
-                stroke="currentColor"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Download Brochure
+            Book an Executive Briefing
+            <span className={styles.ctaSecondaryNote}>(Teams / Institutions)</span>
           </a>
         </div>
 
@@ -108,9 +129,9 @@ export default function Hero() {
         {/* Trust stats */}
         <div className={styles.stats} role="list" aria-label="Summit highlights">
           {[
-            'Pan-African Forum',
+            'COMESA · SADC · AU',
             'Executive Track',
-            '5 Days · Cape Town',
+            '5 Days · The Bay Hotel',
           ].map((label) => (
             <div key={label} className={styles.stat} role="listitem">
               <span className={styles.statDot} aria-hidden="true" />

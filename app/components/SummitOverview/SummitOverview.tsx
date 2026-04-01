@@ -55,7 +55,7 @@ export default function SummitOverview() {
   }, [])
 
   return (
-    <section className={styles.section} aria-labelledby="overview-heading">
+    <section id="overview" className={styles.section} aria-labelledby="overview-heading">
       <div className={styles.grid}>
 
         {/* ── Left column ── */}

@@ -4,118 +4,157 @@ import { useEffect, useRef, useState } from 'react'
 import styles from './Pricing.module.css'
 
 /* ─── Tier data ──────────────────────────────────────────────────────────────── */
-/* Prices verbatim from PDF / CLAUDE.md — do not modify */
 const TIERS = [
   {
-    id:           'networking',
-    label:        'Networking Event Only',
-    labelColor:   'var(--color-teal)',
-    price:        '1,175',
-    dateRange:    '15 May 2026',
-    featured:     false,
-    ribbon:       false,
-    inclusions: [
-      'Access to networking event on 15 May 2026',
-      'Cross-sector partnership forum',
-      'Pan-African delegate mixer',
-    ],
-    ctaClass:  styles.ctaOutlined,
+    id:       'individual',
+    label:    'Individual Seat',
+    seats:    '1 seat',
+    price:    '3,000',
+    priceNote: 'per seat',
+    featured:  true,
+    ribbon:    true,
+    ribbonText: 'Recommended',
+    ctaLabel:  'Reserve My Seat',
+    ctaHref:   '#register',
     delay:     0,
+    inclusions: [
+      '5 days of executive-level training (11–15 May)',
+      'Executive workbook + governance templates',
+      'Certificate of completion',
+      'Institutional approval letter',
+      '30-day post-event group clinic — 2 sessions',
+    ],
+    bonus: '30-day implementation clinic included',
   },
   {
-    id:           'corporate',
-    label:        'Main Event · Corporate',
-    labelColor:   'var(--color-gold)',
-    price:        '2,270',
-    dateRange:    '11–14 May 2026',
-    featured:     true,
-    ribbon:       true,
+    id:       'team',
+    label:    'Team Package',
+    seats:    '2–5 seats',
+    price:    '3,000',
+    priceNote: 'per seat · team incentive available',
+    featured:  false,
+    ribbon:    false,
+    ribbonText: '',
+    ctaLabel:  'Book Executive Briefing',
+    ctaHref:   '#register',
+    delay:     100,
     inclusions: [
-      '4 days of plenary sessions (11–14 May)',
-      'Keynotes, workshops & masterclasses',
-      'Policy roundtables & live demonstrations',
+      'All Individual Seat inclusions per attendee',
+      'Team coordination and group onboarding',
+      '1 private 60-min Institution Risk Mapping session (online)',
+      'Invoice for institutional procurement',
     ],
-    ctaClass:  styles.ctaSolidGold,
-    delay:     120,
+    bonus: null,
   },
   {
-    id:           'individual',
-    label:        'Main Event · Individual',
-    labelColor:   'var(--color-teal)',
-    price:        '2,740',
-    dateRange:    '11–14 May 2026',
-    featured:     false,
-    ribbon:       false,
+    id:       'institutional',
+    label:    'Institutional Package',
+    seats:    '6–15 seats',
+    price:    null,
+    priceNote: 'Contact us for institutional pricing',
+    featured:  false,
+    ribbon:    false,
+    ribbonText: '',
+    ctaLabel:  'Request Institutional Package',
+    ctaHref:   '#register',
+    delay:     200,
     inclusions: [
-      '4 days of plenary sessions (11–14 May)',
-      'Keynotes, workshops & masterclasses',
-      'Policy roundtables & live demonstrations',
+      'All Team Package inclusions',
+      'Policy starter pack — ready-to-use governance templates',
+      '90-day implementation support option',
+      'Dedicated relationship manager',
+      'Path to strategic partnership / MoU',
     ],
-    ctaClass:  styles.ctaSolidTeal,
-    delay:     240,
+    bonus: null,
+  },
+  {
+    id:       'partner',
+    label:    'Strategic Partner',
+    seats:    '16+ seats or ongoing',
+    price:    null,
+    priceNote: 'Membership & partnership pricing',
+    featured:  false,
+    ribbon:    false,
+    ribbonText: '',
+    ctaLabel:  'Enquire About Partnership',
+    ctaHref:   '#register',
+    delay:     300,
+    inclusions: [
+      'Institutional seat allocation across cohorts',
+      'Ongoing capability-building programme',
+      'Co-branding and regional visibility opportunities',
+      'MoU framework for long-term engagement',
+      'Continuous revenue model for your institution',
+    ],
+    bonus: null,
   },
 ] as const
 
 /* ─── Pricing ────────────────────────────────────────────────────────────────── */
 export default function Pricing() {
-  const gridRef                       = useRef<HTMLDivElement>(null)
-  const [revealed, setRevealed]       = useState(false)
+  const gridRef                 = useRef<HTMLDivElement>(null)
+  const [revealed, setRevealed] = useState(false)
 
   useEffect(() => {
     const el = gridRef.current
     if (!el) return
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setRevealed(true)
-          obs.disconnect()
-        }
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      ([entry]) => { if (entry.isIntersecting) { setRevealed(true); obs.disconnect() } },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
     )
     obs.observe(el)
     return () => obs.disconnect()
   }, [])
 
   return (
-    <section className={styles.section} aria-labelledby="pricing-heading">
+    <section id="pricing" className={styles.section} aria-labelledby="pricing-heading">
 
       {/* Header */}
       <header className={styles.header}>
         <span className={styles.label}>Investment</span>
         <h2 id="pricing-heading" className={styles.heading}>
-          Secure Your Place
+          Choose Your Path
         </h2>
+        <p className={styles.subHeading}>
+          Same core programme. Packaged for the right level of engagement.
+        </p>
       </header>
 
       {/* Cards */}
       <div ref={gridRef} className={styles.grid} role="list">
-        {TIERS.map(({ id, label, labelColor, price, dateRange, featured, ribbon, inclusions, ctaClass, delay }) => (
+        {TIERS.map(({ id, label, seats, price, priceNote, featured, ribbon, ribbonText, ctaLabel, ctaHref, inclusions, bonus, delay }) => (
           <article
             key={id}
             role="listitem"
             className={`${styles.card} ${featured ? styles.cardFeatured : ''} ${revealed ? styles.animate : ''}`}
             style={revealed ? { animationDelay: `${delay}ms` } : undefined}
-            aria-label={`${label} — USD ${price}`}
+            aria-label={`${label} — ${price ? `USD ${price}` : 'contact for pricing'}`}
           >
-            {/* Corner ribbon — CSS only, featured card only */}
             {ribbon && (
-              <div className={styles.ribbon} aria-hidden="true" />
+              <div className={styles.ribbon} aria-hidden="true">
+                <span>{ribbonText}</span>
+              </div>
             )}
 
-            {/* Tier label */}
-            <p className={styles.tierLabel} style={{ color: labelColor }}>
-              {label}
-            </p>
+            {/* Tier label + seats */}
+            <div className={styles.tierTop}>
+              <p className={styles.tierLabel}>{label}</p>
+              <span className={styles.tierSeats}>{seats}</span>
+            </div>
 
             {/* Price */}
             <div className={styles.priceBlock}>
-              <span className={styles.currency}>USD</span>
-              <span className={styles.price}>{price}</span>
+              {price ? (
+                <>
+                  <span className={styles.currency}>USD</span>
+                  <span className={styles.price}>{price}</span>
+                </>
+              ) : (
+                <span className={styles.priceContact}>Contact Us</span>
+              )}
             </div>
-            <p className={styles.dateRange}>{dateRange}</p>
+            <p className={styles.priceNote}>{priceNote}</p>
 
-            {/* Divider */}
             <hr className={styles.cardDivider} />
 
             {/* Inclusions */}
@@ -128,25 +167,65 @@ export default function Pricing() {
               ))}
             </ul>
 
+            {/* Bonus badge */}
+            {bonus && (
+              <p className={styles.bonus} aria-label="Included bonus">
+                <span className={styles.bonusDot} aria-hidden="true" />
+                {bonus}
+              </p>
+            )}
+
             {/* CTA */}
             <a
-              href="https://www.siccai.org/south-africa-summit-registration/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${styles.ctaBase} ${ctaClass}`}
+              href={ctaHref}
+              className={`${styles.ctaBase} ${featured ? styles.ctaSolidGold : styles.ctaOutlined}`}
+              onClick={e => {
+                e.preventDefault()
+                document.querySelector(ctaHref)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
             >
-              Register for This Tier
+              {ctaLabel}
             </a>
           </article>
         ))}
       </div>
 
-      {/* Small print */}
+      {/* Clarity Guarantee */}
+      <div className={styles.guarantee} role="note" aria-label="Clarity guarantee">
+        <div className={styles.guaranteeIcon} aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z"
+              stroke="var(--color-gold)"
+              strokeWidth="1.25"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M9 12l2 2 4-4"
+              stroke="var(--color-gold)"
+              strokeWidth="1.25"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <div>
+          <p className={styles.guaranteeTitle}>Clarity Guarantee</p>
+          <p className={styles.guaranteeBody}>
+            If, by the end of Day 1, you cannot identify at least 5 priority actions
+            to improve availability, integrity, confidentiality, and responsible AI
+            governance in your institution, you may request a full refund in writing
+            before Day 2 begins.
+          </p>
+        </div>
+      </div>
+
+      {/* Footnote */}
       <p className={styles.footnote}>
         Payment details and invoice provided upon registration.
         Contact{' '}
         <a href="mailto:training@siccai.org">training@siccai.org</a>
-        {' '}for group bookings.
+        {' '}for group and institutional bookings.
       </p>
 
     </section>

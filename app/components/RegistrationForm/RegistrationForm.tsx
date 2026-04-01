@@ -1,104 +1,86 @@
 'use client'
 
-/* `inert` is boolean | undefined in React 18's type definitions */
-
 import { useState, useCallback } from 'react'
 import styles from './RegistrationForm.module.css'
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 interface FormValues {
-  firstName:            string
-  lastName:             string
-  nationality:          string
-  organization:         string
-  jobTitle:             string
-  email:                string
-  countryCode:          string
-  phone:                string
-  accessibilityNeeds:   '' | 'yes' | 'no'
-  accessibilityDetails: string
-  ticketType:           '' | 'networking' | 'corporate' | 'individual'
-  consent1:             boolean
-  consent2:             boolean
-  consent3:             boolean
+  /* Step 1 — Qualify */
+  role:         '' | 'ceo' | 'director' | 'policy' | 'cyber' | 'other'
+  orgType:      '' | 'government' | 'finance' | 'telecom' | 'health' | 'education' | 'ngo' | 'private'
+  region:       '' | 'comesa' | 'sadc' | 'au_other' | 'outside'
+  priority:     '' | 'availability' | 'breach' | 'policy' | 'ai' | 'compliance'
+  seats:        '' | '1' | '2-5' | '6-15' | '16+'
+
+  /* Step 2 — Budget + Contact preference */
+  budgetStatus: '' | 'approved' | 'in-progress' | 'not-yet'
+  timeframe:    '' | '0-30' | '31-90' | '90+'
+  contactPref:  '' | 'whatsapp' | 'email' | 'assistant'
+  invoiceNeeded: boolean
+
+  /* Step 3 — Contact details */
+  fullName:           string
+  jobTitle:           string
+  organization:       string
+  country:            string
+  email:              string
+  whatsapp:           string
+  teamSize:           string
+  execAssistName:     string
+  execAssistWhatsapp: string
+  execAssistEmail:    string
+  showExecAssist:     boolean
 }
 
 type Errors = Partial<Record<keyof FormValues, string>>
 
-/* ─── Constants ──────────────────────────────────────────────────────────────── */
 const INITIAL: FormValues = {
-  firstName: '', lastName: '', nationality: '', organization: '', jobTitle: '',
-  email: '', countryCode: '+254', phone: '',
-  accessibilityNeeds: '', accessibilityDetails: '',
-  ticketType: '', consent1: false, consent2: false, consent3: false,
+  role: '', orgType: '', region: '', priority: '', seats: '',
+  budgetStatus: '', timeframe: '', contactPref: '', invoiceNeeded: false,
+  fullName: '', jobTitle: '', organization: '', country: '', email: '',
+  whatsapp: '', teamSize: '', execAssistName: '', execAssistWhatsapp: '',
+  execAssistEmail: '', showExecAssist: false,
 }
 
-const COUNTRY_CODES = [
-  { code: '+254', label: '+254  Kenya'          },
-  { code: '+27',  label: '+27   South Africa'   },
-  { code: '+234', label: '+234  Nigeria'         },
-  { code: '+233', label: '+233  Ghana'           },
-  { code: '+256', label: '+256  Uganda'          },
-  { code: '+255', label: '+255  Tanzania'        },
-  { code: '+260', label: '+260  Zambia'          },
-  { code: '+263', label: '+263  Zimbabwe'        },
-  { code: '+237', label: '+237  Cameroon'        },
-  { code: '+225', label: '+225  Côte d\'Ivoire'  },
-  { code: '+221', label: '+221  Senegal'         },
-  { code: '+212', label: '+212  Morocco'         },
-  { code: '+20',  label: '+20   Egypt'           },
-  { code: '+251', label: '+251  Ethiopia'        },
-  { code: '+1',   label: '+1    US / Canada'     },
-  { code: '+44',  label: '+44   United Kingdom'  },
-  { code: '+33',  label: '+33   France'          },
-  { code: '+49',  label: '+49   Germany'         },
-  { code: '+971', label: '+971  UAE'             },
-  { code: '+91',  label: '+91   India'           },
-  { code: '+61',  label: '+61   Australia'       },
-]
+/* ─── Lane routing ───────────────────────────────────────────────────────────── */
+type Lane = 'individual' | 'team' | 'partner'
 
-/* Prices verbatim from PDF */
-const TICKETS = [
-  { id: 'networking' as const, label: 'Networking Event Only',  price: '1,175', date: '15 May 2026'       },
-  { id: 'corporate'  as const, label: 'Main Event · Corporate', price: '2,270', date: '11–14 May 2026'    },
-  { id: 'individual' as const, label: 'Main Event · Individual',price: '2,740', date: '11–14 May 2026'    },
-]
-
-const CONSENTS = [
-  { field: 'consent1' as const, text: 'I confirm my registration for this non-technical training.', required: true  },
-  { field: 'consent2' as const, text: 'I agree to receive training materials and updates via email.', required: true  },
-  { field: 'consent3' as const, text: 'I consent to the use of training session photos/videos for internal or promotional purposes.', required: false, optional: true },
-]
+function getLane(values: FormValues): Lane {
+  if (values.role === 'policy' || values.seats === '16+') return 'partner'
+  if (values.seats === '1' || values.seats === '') return 'individual'
+  return 'team'
+}
 
 /* ─── Validation ─────────────────────────────────────────────────────────────── */
 function validateStep1(v: FormValues): Errors {
   const e: Errors = {}
-  if (!v.firstName.trim())    e.firstName    = 'First name is required'
-  if (!v.lastName.trim())     e.lastName     = 'Last name is required'
-  if (!v.nationality.trim())  e.nationality  = 'Country / nationality is required'
-  if (!v.organization.trim()) e.organization = 'Organisation is required'
-  if (!v.jobTitle.trim())     e.jobTitle     = 'Job title is required'
+  if (!v.role)     e.role     = 'Please select your role'
+  if (!v.orgType)  e.orgType  = 'Please select your organisation type'
+  if (!v.region)   e.region   = 'Please select your region'
+  if (!v.priority) e.priority = 'Please select your main priority'
+  if (!v.seats)    e.seats    = 'Please select the number of seats needed'
   return e
 }
 
 function validateStep2(v: FormValues): Errors {
   const e: Errors = {}
-  if (!v.email.trim())
-    e.email = 'Email address is required'
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))
-    e.email = 'Enter a valid email address'
-  if (!v.phone.trim())
-    e.phone = 'Phone number is required'
-  if (!v.accessibilityNeeds)
-    e.accessibilityNeeds = 'Please select an option'
+  if (!v.budgetStatus) e.budgetStatus = 'Please select a budget status'
+  if (!v.timeframe)    e.timeframe    = 'Please select a timeframe'
+  if (!v.contactPref)  e.contactPref  = 'Please select a contact preference'
   return e
 }
 
 function validateStep3(v: FormValues): Errors {
   const e: Errors = {}
-  if (!v.ticketType) e.ticketType = 'Please select a ticket type to continue'
-  if (!v.consent1)   e.consent1   = 'This confirmation is required to register'
-  if (!v.consent2)   e.consent2   = 'This agreement is required to register'
+  if (!v.fullName.trim())     e.fullName     = 'Full name is required'
+  if (!v.jobTitle.trim())     e.jobTitle     = 'Job title is required'
+  if (!v.organization.trim()) e.organization = 'Organisation is required'
+  if (!v.country.trim())      e.country      = 'Country is required'
+  if (!v.email.trim())
+    e.email = 'Email address is required'
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))
+    e.email = 'Enter a valid email address'
+  if (!v.whatsapp.trim())     e.whatsapp     = 'WhatsApp number is required'
   return e
 }
 
@@ -120,18 +102,33 @@ function Field({
   )
 }
 
+function SelectField({
+  label, required, error, value, onChange, placeholder, children,
+}: {
+  label: string; required?: boolean; error?: string
+  value: string; onChange: (v: string) => void
+  placeholder: string; children: React.ReactNode
+}) {
+  return (
+    <Field label={label} required={required} error={error}>
+      <select
+        className={`${styles.selectField} ${error ? styles.inputError : ''}`}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+      >
+        <option value="" disabled>{placeholder}</option>
+        {children}
+      </select>
+    </Field>
+  )
+}
+
 function SuccessIcon() {
   return (
     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="32" cy="32" r="30" stroke="var(--color-gold)" strokeWidth="1" opacity="0.25"/>
       <circle cx="32" cy="32" r="22" stroke="var(--color-gold)" strokeWidth="1.25"/>
-      <path
-        d="M21 32l8 8 14-16"
-        stroke="var(--color-gold)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M21 32l8 8 14-16" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 }
@@ -141,6 +138,39 @@ function CheckDot() {
     <svg width="10" height="8" viewBox="0 0 10 8" fill="none" aria-hidden="true">
       <path d="M1 4l3 3 5-6" stroke="var(--color-bg)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
+  )
+}
+
+function LaneOutcome({ lane, values }: { lane: Lane; values: FormValues }) {
+  if (lane === 'individual') {
+    return (
+      <div className={styles.laneOutcome}>
+        <p className={styles.laneOutcomeTitle}>Your next step</p>
+        <p className={styles.laneOutcomeBody}>
+          {values.invoiceNeeded
+            ? 'Our team will send you a formal invoice and procurement documentation within 24 hours. Your seat will be reserved upon payment confirmation.'
+            : 'Our team will contact you within 24 hours with payment details and logistics for your individual seat at the Summit.'}
+        </p>
+      </div>
+    )
+  }
+  if (lane === 'team') {
+    return (
+      <div className={styles.laneOutcome}>
+        <p className={styles.laneOutcomeTitle}>We will schedule your Executive Briefing</p>
+        <p className={styles.laneOutcomeBody}>
+          A 20-minute &ldquo;Secure &amp; Innovation-Ready Executive Briefing&rdquo; will be arranged for your team. Our team will reach out within 24 hours to confirm timing and share a calendar invite.
+        </p>
+      </div>
+    )
+  }
+  return (
+    <div className={styles.laneOutcome}>
+      <p className={styles.laneOutcomeTitle}>Partnership &amp; Membership Inquiry</p>
+      <p className={styles.laneOutcomeBody}>
+        Your inquiry has been flagged for a Partnership / Membership call (30 min). Our team will be in touch within 24 hours to discuss institutional engagement, MoU opportunities, and ongoing capability building.
+      </p>
+    </div>
   )
 }
 
@@ -154,13 +184,15 @@ export default function RegistrationForm() {
   const [submitting,  setSubmitting]  = useState(false)
   const [submitted,   setSubmitted]   = useState(false)
 
-  const set = useCallback((field: keyof FormValues, value: string | boolean) => {
+  const lane = getLane(values)
+
+  const set = useCallback(<K extends keyof FormValues>(field: K, value: FormValues[K]) => {
     setValues(prev => ({ ...prev, [field]: value }))
     setErrors(prev => { const n = { ...prev }; delete n[field]; return n })
   }, [])
 
   const advance = () => {
-    const errs = step === 1 ? validateStep1(values) : validateStep2(values)
+    const errs = step === 1 ? validateStep1(values) : step === 2 ? validateStep2(values) : {}
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setErrors({})
     setDirection('fwd')
@@ -185,146 +217,257 @@ export default function RegistrationForm() {
   /* ── Success state ── */
   if (submitted) {
     return (
-      <section className={styles.section} aria-label="Registration confirmed">
+      <section id="register" className={styles.section} aria-label="Registration confirmed">
         <div className={styles.inner}>
           <div className={styles.success}>
             <div className={styles.successIcon}><SuccessIcon /></div>
-            <h2 className={styles.successHeading}>You&apos;re Registered</h2>
+            <h2 className={styles.successHeading}>
+              {lane === 'individual' ? 'Seat Reserved' : lane === 'team' ? 'Briefing Requested' : 'Inquiry Received'}
+            </h2>
             <p className={styles.successMessage}>
-              Thank you, {values.firstName}. We&apos;ll be in touch within 24 hours
-              with payment details and logistics for the Continental Summit on
-              Cybersecurity &amp; AI — Cape Town 2026.
+              Thank you, {values.fullName.split(' ')[0]}. Our team will be in touch within 24 hours with payment and logistics details.
             </p>
+            <LaneOutcome lane={lane} values={values} />
           </div>
         </div>
       </section>
     )
   }
 
-  /* ── Main form ── */
+  const laneLabel =
+    lane === 'individual' ? 'Individual Seat — USD 3,000' :
+    lane === 'team'       ? 'Team / Institution — Executive Briefing' :
+                            'Partnership / Membership Inquiry'
+
   return (
-    <section className={styles.section} aria-labelledby="form-heading">
+    <section id="register" className={styles.section} aria-labelledby="form-heading">
       <div className={styles.inner}>
 
-        {/* Header */}
         <header className={styles.header}>
-          <h2 id="form-heading" className={styles.heading}>
-            Secure Your Place at the Summit
-          </h2>
+          <h2 id="form-heading" className={styles.heading}>Reserve Your Place</h2>
           <p className={styles.subText}>
-            Complete the form below. Our team will confirm your registration
-            within 24 hours.
+            Complete the qualification form below. Our team responds within 24 hours.
           </p>
         </header>
 
         <div className={styles.formWrap}>
 
-          {/* ── Progress indicator ── */}
+          {/* Lane indicator */}
+          {step >= 2 && values.seats && (
+            <div className={styles.laneIndicator} aria-live="polite">
+              <span className={styles.laneDot} aria-hidden="true" />
+              <span className={styles.laneLabel}>{laneLabel}</span>
+            </div>
+          )}
+
+          {/* Progress */}
           <nav className={styles.progress} aria-label="Registration steps">
-            {[
-              { num: 1, label: 'About You'     },
-              { num: 2, label: 'Contact'        },
-              { num: 3, label: 'Registration'   },
-            ].map(({ num, label }, i, arr) => (
-              <div key={num} className={styles.progressItem}>
-                <div
-                  className={`${styles.progressDot} ${step >= num ? styles.progressDotActive : ''}`}
-                  aria-current={step === num ? 'step' : undefined}
-                >
-                  {step > num ? <CheckDot /> : <span>{num}</span>}
-                </div>
-                <span className={`${styles.progressLabel} ${step === num ? styles.progressLabelActive : ''}`}>
-                  {label}
-                </span>
-                {i < arr.length - 1 && (
+            {[{ num: 1, label: 'Qualify' }, { num: 2, label: 'Budget' }, { num: 3, label: 'Contact' }].map(
+              ({ num, label }, i, arr) => (
+                <div key={num} className={styles.progressItem}>
                   <div
-                    className={`${styles.progressLine} ${step > num ? styles.progressLineFilled : ''}`}
-                    aria-hidden="true"
-                  />
-                )}
-              </div>
-            ))}
-          </nav>
-
-          {/* ── Step panels ── */}
-          <div className={styles.stepOuter}>
-
-            {/* Exiting panel — absolute overlay, animated away */}
-            {exitingStep !== null && (() => {
-              const n = exitingStep
-              return (
-                <div
-                  className={styles.stepExiting}
-                  data-dir={direction}
-                  onAnimationEnd={() => setExitingStep(null)}
-                  aria-hidden="true"
-                >
-                  {n === 1 && (
-                    <>
-                      <p className={styles.stepTitle}>About You</p>
-                      <div className={styles.fieldRow}>
-                        <Field label="First Name" required><input className={styles.input} value={values.firstName} readOnly /></Field>
-                        <Field label="Last Name"  required><input className={styles.input} value={values.lastName}  readOnly /></Field>
-                      </div>
-                      <Field label="Country / Nationality" required><input className={styles.input} value={values.nationality}  readOnly /></Field>
-                      <Field label="Organisation / Company" required><input className={styles.input} value={values.organization} readOnly /></Field>
-                      <Field label="Job Title / Role" required><input className={styles.input} value={values.jobTitle} readOnly /></Field>
-                    </>
-                  )}
-                  {n === 2 && (
-                    <>
-                      <p className={styles.stepTitle}>Contact Details</p>
-                      <Field label="Email Address" required><input className={styles.input} value={values.email} readOnly /></Field>
-                      <Field label="Phone Number"  required><input className={styles.input} value={`${values.countryCode} ${values.phone}`} readOnly /></Field>
-                    </>
-                  )}
-                  {n === 3 && (
-                    <p className={styles.stepTitle}>Your Registration</p>
+                    className={`${styles.progressDot} ${step >= num ? styles.progressDotActive : ''}`}
+                    aria-current={step === num ? 'step' : undefined}
+                  >
+                    {step > num ? <CheckDot /> : <span>{num}</span>}
+                  </div>
+                  <span className={`${styles.progressLabel} ${step === num ? styles.progressLabelActive : ''}`}>
+                    {label}
+                  </span>
+                  {i < arr.length - 1 && (
+                    <div className={`${styles.progressLine} ${step > num ? styles.progressLineFilled : ''}`} aria-hidden="true" />
                   )}
                 </div>
               )
-            })()}
+            )}
+          </nav>
 
-            {/* Active panel */}
-            <div
-              className={styles.stepActive}
-              data-dir={direction}
-              key={step}
-            >
+          {/* Step panels */}
+          <div className={styles.stepOuter}>
+            {exitingStep !== null && (
+              <div
+                className={styles.stepExiting}
+                data-dir={direction}
+                onAnimationEnd={() => setExitingStep(null)}
+                aria-hidden="true"
+              />
+            )}
 
-              {/* ── Step 1: About You ── */}
+            <div className={styles.stepActive} data-dir={direction} key={step}>
+
+              {/* ── Step 1: Qualify ── */}
               {step === 1 && (
                 <>
-                  <p className={styles.stepTitle}>About You</p>
+                  <p className={styles.stepTitle}>Tell us about yourself</p>
 
-                  <div className={styles.fieldRow}>
-                    <Field label="First Name" required error={errors.firstName}>
-                      <input
-                        className={`${styles.input} ${errors.firstName ? styles.inputError : ''}`}
-                        value={values.firstName}
-                        onChange={e => set('firstName', e.target.value)}
-                        autoComplete="given-name"
-                        placeholder="Amara"
-                      />
-                    </Field>
-                    <Field label="Last Name" required error={errors.lastName}>
-                      <input
-                        className={`${styles.input} ${errors.lastName ? styles.inputError : ''}`}
-                        value={values.lastName}
-                        onChange={e => set('lastName', e.target.value)}
-                        autoComplete="family-name"
-                        placeholder="Osei"
-                      />
-                    </Field>
+                  <SelectField
+                    label="Your role" required
+                    value={values.role} onChange={v => set('role', v as FormValues['role'])}
+                    placeholder="Select your role…"
+                    error={errors.role}
+                  >
+                    <option value="ceo">CEO / MD</option>
+                    <option value="director">Director / Head of Department</option>
+                    <option value="policy">Policy Maker / Regulator</option>
+                    <option value="cyber">Cybersecurity / IT Lead</option>
+                    <option value="other">Other Senior Role</option>
+                  </SelectField>
+
+                  <SelectField
+                    label="Organisation type" required
+                    value={values.orgType} onChange={v => set('orgType', v as FormValues['orgType'])}
+                    placeholder="Select organisation type…"
+                    error={errors.orgType}
+                  >
+                    <option value="government">Government / Agency</option>
+                    <option value="finance">Bank / Financial Services</option>
+                    <option value="telecom">Telecom / ISP</option>
+                    <option value="health">Healthcare</option>
+                    <option value="education">Education</option>
+                    <option value="ngo">NGO / Development</option>
+                    <option value="private">Private Company</option>
+                  </SelectField>
+
+                  <SelectField
+                    label="Your region" required
+                    value={values.region} onChange={v => set('region', v as FormValues['region'])}
+                    placeholder="Select your region…"
+                    error={errors.region}
+                  >
+                    <option value="comesa">COMESA member state</option>
+                    <option value="sadc">SADC member state</option>
+                    <option value="au_other">Other AU member state</option>
+                    <option value="outside">Outside Africa</option>
+                  </SelectField>
+
+                  <SelectField
+                    label="Main priority right now" required
+                    value={values.priority} onChange={v => set('priority', v as FormValues['priority'])}
+                    placeholder="Select your main priority…"
+                    error={errors.priority}
+                  >
+                    <option value="availability">Reduce service disruption / downtime</option>
+                    <option value="breach">Prevent data loss / breach</option>
+                    <option value="policy">Build Cybersecurity policy and controls</option>
+                    <option value="ai">Govern AI adoption / misinformation risk</option>
+                    <option value="compliance">Meet regulatory and cross-border compliance</option>
+                  </SelectField>
+
+                  <SelectField
+                    label="Training seats needed" required
+                    value={values.seats} onChange={v => set('seats', v as FormValues['seats'])}
+                    placeholder="Select number of seats…"
+                    error={errors.seats}
+                  >
+                    <option value="1">1 seat — Individual</option>
+                    <option value="2-5">2–5 seats — Team</option>
+                    <option value="6-15">6–15 seats — Institutional</option>
+                    <option value="16+">16+ seats — Partnership</option>
+                  </SelectField>
+
+                  {values.seats === '1' && (
+                    <p className={styles.routeHint}>→ Individual seat path: checkout + invoice option</p>
+                  )}
+                  {(values.seats === '2-5' || values.seats === '6-15') && (
+                    <p className={styles.routeHint}>→ Team path: we will schedule your Executive Briefing (20 min)</p>
+                  )}
+                  {values.seats === '16+' && (
+                    <p className={styles.routeHint}>→ Partnership path: we will schedule a Membership / MoU call (30 min)</p>
+                  )}
+
+                  <div className={styles.stepFooter}>
+                    <span />
+                    <button type="button" className={styles.continueBtn} onClick={advance}>
+                      Continue →
+                    </button>
                   </div>
+                </>
+              )}
 
-                  <Field label="Country / Nationality" required error={errors.nationality}>
+              {/* ── Step 2: Budget + Contact preference ── */}
+              {step === 2 && (
+                <>
+                  <p className={styles.stepTitle}>Budget &amp; Contact Preference</p>
+
+                  <SelectField
+                    label="Training budget status" required
+                    value={values.budgetStatus} onChange={v => set('budgetStatus', v as FormValues['budgetStatus'])}
+                    placeholder="Select budget status…"
+                    error={errors.budgetStatus}
+                  >
+                    <option value="approved">Budget approved</option>
+                    <option value="in-progress">In progress / pending approval</option>
+                    <option value="not-yet">Not yet allocated</option>
+                  </SelectField>
+
+                  <SelectField
+                    label="When do you need this implemented?" required
+                    value={values.timeframe} onChange={v => set('timeframe', v as FormValues['timeframe'])}
+                    placeholder="Select timeframe…"
+                    error={errors.timeframe}
+                  >
+                    <option value="0-30">Within 30 days</option>
+                    <option value="31-90">31–90 days</option>
+                    <option value="90+">90+ days</option>
+                  </SelectField>
+
+                  <SelectField
+                    label="Preferred contact method" required
+                    value={values.contactPref} onChange={v => set('contactPref', v as FormValues['contactPref'])}
+                    placeholder="Select contact method…"
+                    error={errors.contactPref}
+                  >
+                    <option value="whatsapp">WhatsApp (fastest)</option>
+                    <option value="email">Email</option>
+                    <option value="assistant">Via my Executive Assistant</option>
+                  </SelectField>
+
+                  {lane === 'individual' && (
+                    <div className={styles.fieldGroup}>
+                      <label className={styles.checkboxRow}>
+                        <input
+                          type="checkbox"
+                          className={styles.checkboxInput}
+                          checked={values.invoiceNeeded}
+                          onChange={e => set('invoiceNeeded', e.target.checked)}
+                        />
+                        <span className={styles.checkboxCustom} />
+                        <span className={styles.checkboxLabel}>
+                          I need a formal invoice for procurement / budget approval
+                        </span>
+                      </label>
+                    </div>
+                  )}
+
+                  <div className={styles.stepFooter}>
+                    <button type="button" className={styles.backBtn} onClick={back}>← Back</button>
+                    <button type="button" className={styles.continueBtn} onClick={advance}>Continue →</button>
+                  </div>
+                </>
+              )}
+
+              {/* ── Step 3: Contact details ── */}
+              {step === 3 && (
+                <>
+                  <p className={styles.stepTitle}>Your Contact Details</p>
+
+                  <Field label="Full Name" required error={errors.fullName}>
                     <input
-                      className={`${styles.input} ${errors.nationality ? styles.inputError : ''}`}
-                      value={values.nationality}
-                      onChange={e => set('nationality', e.target.value)}
-                      autoComplete="country-name"
-                      placeholder="e.g. Kenya"
+                      className={`${styles.input} ${errors.fullName ? styles.inputError : ''}`}
+                      value={values.fullName}
+                      onChange={e => set('fullName', e.target.value)}
+                      autoComplete="name"
+                      placeholder="e.g. Amara Osei"
+                    />
+                  </Field>
+
+                  <Field label="Job Title" required error={errors.jobTitle}>
+                    <input
+                      className={`${styles.input} ${errors.jobTitle ? styles.inputError : ''}`}
+                      value={values.jobTitle}
+                      onChange={e => set('jobTitle', e.target.value)}
+                      autoComplete="organization-title"
+                      placeholder="e.g. Chief Executive Officer"
                     />
                   </Field>
 
@@ -338,29 +481,15 @@ export default function RegistrationForm() {
                     />
                   </Field>
 
-                  <Field label="Job Title / Role" required error={errors.jobTitle}>
+                  <Field label="Country" required error={errors.country}>
                     <input
-                      className={`${styles.input} ${errors.jobTitle ? styles.inputError : ''}`}
-                      value={values.jobTitle}
-                      onChange={e => set('jobTitle', e.target.value)}
-                      autoComplete="organization-title"
-                      placeholder="e.g. Chief Executive Officer"
+                      className={`${styles.input} ${errors.country ? styles.inputError : ''}`}
+                      value={values.country}
+                      onChange={e => set('country', e.target.value)}
+                      autoComplete="country-name"
+                      placeholder="e.g. Kenya"
                     />
                   </Field>
-
-                  <div className={styles.stepFooter}>
-                    <span />
-                    <button type="button" className={styles.continueBtn} onClick={advance}>
-                      Continue
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {/* ── Step 2: Contact Details ── */}
-              {step === 2 && (
-                <>
-                  <p className={styles.stepTitle}>Contact Details</p>
 
                   <Field label="Email Address" required error={errors.email}>
                     <input
@@ -373,151 +502,78 @@ export default function RegistrationForm() {
                     />
                   </Field>
 
-                  <Field label="Phone Number" required error={errors.phone}>
-                    <div className={styles.phoneRow}>
-                      <select
-                        className={styles.countryCodeSelect}
-                        value={values.countryCode}
-                        onChange={e => set('countryCode', e.target.value)}
-                        aria-label="Country calling code"
-                      >
-                        {COUNTRY_CODES.map(({ code, label }) => (
-                          <option key={code} value={code}>{label}</option>
-                        ))}
-                      </select>
-                      <input
-                        className={`${styles.input} ${errors.phone ? styles.inputError : ''}`}
-                        type="tel"
-                        value={values.phone}
-                        onChange={e => set('phone', e.target.value)}
-                        autoComplete="tel-national"
-                        placeholder="712 345 678"
-                        style={{ flex: 1 }}
-                      />
-                    </div>
+                  <Field label="WhatsApp Number (with country code)" required error={errors.whatsapp}>
+                    <input
+                      className={`${styles.input} ${errors.whatsapp ? styles.inputError : ''}`}
+                      type="tel"
+                      value={values.whatsapp}
+                      onChange={e => set('whatsapp', e.target.value)}
+                      placeholder="+254 712 345 678"
+                    />
                   </Field>
 
-                  {/* Accessibility needs */}
-                  <div className={styles.fieldGroup}>
-                    <p className={styles.fieldLabel}>
-                      Do you have any accessibility or accommodation needs?
-                      <span className={styles.fieldRequired} aria-hidden="true"> *</span>
-                    </p>
-                    <div className={styles.toggleRow} role="group" aria-label="Accessibility or accommodation needs">
-                      {(['no', 'yes'] as const).map(opt => (
-                        <button
-                          key={opt}
-                          type="button"
-                          className={`${styles.toggleBtn} ${values.accessibilityNeeds === opt ? styles.toggleBtnActive : ''}`}
-                          onClick={() => set('accessibilityNeeds', opt)}
-                          aria-pressed={values.accessibilityNeeds === opt}
-                        >
-                          {opt === 'yes' ? 'Yes' : 'No'}
-                        </button>
-                      ))}
-                    </div>
-                    {errors.accessibilityNeeds && (
-                      <p className={styles.errorMsg} role="alert">{errors.accessibilityNeeds}</p>
-                    )}
+                  {(lane === 'team' || lane === 'partner') && (
+                    <Field label="Number of team members attending" error={undefined}>
+                      <input
+                        className={styles.input}
+                        type="number"
+                        min="2"
+                        value={values.teamSize}
+                        onChange={e => set('teamSize', e.target.value)}
+                        placeholder="e.g. 5"
+                      />
+                    </Field>
+                  )}
 
-                    <div className={`${styles.expandable} ${values.accessibilityNeeds === 'yes' ? styles.expandableOpen : ''}`}>
+                  {/* Executive assistant */}
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.checkboxRow}>
+                      <input
+                        type="checkbox"
+                        className={styles.checkboxInput}
+                        checked={values.showExecAssist}
+                        onChange={e => set('showExecAssist', e.target.checked)}
+                      />
+                      <span className={styles.checkboxCustom} />
+                      <span className={styles.checkboxLabel}>
+                        CC my Executive Assistant on follow-up communications
+                      </span>
+                    </label>
+
+                    <div className={`${styles.expandable} ${values.showExecAssist ? styles.expandableOpen : ''}`}>
                       <div className={styles.expandableInner}>
-                        <Field label="Please describe your needs" error={undefined}>
-                          <textarea
-                            className={styles.textarea}
-                            rows={3}
-                            value={values.accessibilityDetails}
-                            onChange={e => set('accessibilityDetails', e.target.value)}
-                            placeholder="Please specify any accessibility or accommodation requirements…"
-                          />
-                        </Field>
+                        <div style={{ marginTop: 'var(--space-sm)' }}>
+                          <Field label="Assistant's Full Name" error={undefined}>
+                            <input
+                              className={styles.input}
+                              value={values.execAssistName}
+                              onChange={e => set('execAssistName', e.target.value)}
+                              placeholder="Assistant name"
+                            />
+                          </Field>
+                          <Field label="Assistant's WhatsApp" error={undefined}>
+                            <input
+                              className={styles.input}
+                              type="tel"
+                              value={values.execAssistWhatsapp}
+                              onChange={e => set('execAssistWhatsapp', e.target.value)}
+                              placeholder="+254 7XX XXX XXX"
+                            />
+                          </Field>
+                          <Field label="Assistant's Email" error={undefined}>
+                            <input
+                              className={styles.input}
+                              type="email"
+                              value={values.execAssistEmail}
+                              onChange={e => set('execAssistEmail', e.target.value)}
+                              placeholder="assistant@organisation.com"
+                            />
+                          </Field>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className={styles.stepFooter}>
-                    <button type="button" className={styles.backBtn} onClick={back}>
-                      ← Back
-                    </button>
-                    <button type="button" className={styles.continueBtn} onClick={advance}>
-                      Continue
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {/* ── Step 3: Your Registration ── */}
-              {step === 3 && (
-                <>
-                  <p className={styles.stepTitle}>Your Registration</p>
-
-                  {/* Ticket selector */}
-                  <div className={styles.fieldGroup}>
-                    <p className={styles.fieldLabel}>
-                      Ticket Type
-                      <span className={styles.fieldRequired} aria-hidden="true"> *</span>
-                    </p>
-                    <div
-                      className={styles.ticketGrid}
-                      role="radiogroup"
-                      aria-label="Select ticket type"
-                    >
-                      {TICKETS.map(({ id, label, price, date }) => (
-                        <div
-                          key={id}
-                          className={`${styles.ticketCard} ${values.ticketType === id ? styles.ticketCardSelected : ''}`}
-                          onClick={() => set('ticketType', id)}
-                          role="radio"
-                          aria-checked={values.ticketType === id}
-                          tabIndex={0}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault()
-                              set('ticketType', id)
-                            }
-                          }}
-                        >
-                          <p className={styles.ticketLabel}>{label}</p>
-                          <div className={styles.ticketPrice}>
-                            <span className={styles.ticketCurrency}>USD</span>
-                            <span className={styles.ticketAmount}>{price}</span>
-                          </div>
-                          <p className={styles.ticketDate}>{date}</p>
-                          {values.ticketType === id && (
-                            <span className={styles.ticketCheck} aria-hidden="true">✓</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    {errors.ticketType && (
-                      <p className={styles.errorMsg} role="alert">{errors.ticketType}</p>
-                    )}
-                  </div>
-
-                  {/* Consent checkboxes */}
-                  <div className={styles.consentGroup} role="group" aria-label="Registration agreements">
-                    {CONSENTS.map(({ field, text, required, optional }) => (
-                      <label key={field} className={styles.checkboxRow}>
-                        <input
-                          type="checkbox"
-                          className={styles.checkboxInput}
-                          checked={values[field] as boolean}
-                          onChange={e => set(field, e.target.checked)}
-                          required={required}
-                        />
-                        <span className={styles.checkboxCustom} />
-                        <span className={styles.checkboxLabel}>
-                          {text}
-                          {optional && <span className={styles.optionalTag}> (optional)</span>}
-                        </span>
-                        {errors[field] && (
-                          <span className={styles.checkboxError} role="alert">{errors[field]}</span>
-                        )}
-                      </label>
-                    ))}
-                  </div>
-
-                  {/* Submit */}
                   <button
                     type="button"
                     className={styles.submitBtn}
@@ -526,27 +582,24 @@ export default function RegistrationForm() {
                     aria-busy={submitting}
                   >
                     {submitting ? (
-                      <>
-                        <span className={styles.spinner} aria-hidden="true" />
-                        <span>Processing…</span>
-                      </>
+                      <><span className={styles.spinner} aria-hidden="true" /><span>Submitting…</span></>
                     ) : (
-                      'Complete Registration'
+                      lane === 'individual' ? 'Reserve My Seat' :
+                      lane === 'team'       ? 'Request Executive Briefing' :
+                                             'Submit Partnership Inquiry'
                     )}
                   </button>
 
                   <div className={styles.stepFooter} style={{ marginTop: 'var(--space-sm)' }}>
-                    <button type="button" className={styles.backBtn} onClick={back}>
-                      ← Back
-                    </button>
+                    <button type="button" className={styles.backBtn} onClick={back}>← Back</button>
                   </div>
                 </>
               )}
 
-            </div>{/* end .stepActive */}
-          </div>{/* end .stepOuter */}
+            </div>
+          </div>
 
-        </div>{/* end .formWrap */}
+        </div>
       </div>
     </section>
   )

@@ -1,0 +1,191 @@
+/* ─── Objection Handling ──────────────────────────────────────────────────────── */
+.section {
+  position: relative;
+  padding-block: clamp(72px, 9vw, 120px);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba%28185%2C155%2C35%2C0.05%29' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+/* ─── Header ────────────────────────────────────────────────────────────────── */
+.header {
+  max-width: 640px;
+  margin-bottom: var(--space-xl);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: var(--space-sm);
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.sub {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--color-muted);
+}
+
+/* ─── Accordion list ────────────────────────────────────────────────────────── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ─── Item ──────────────────────────────────────────────────────────────────── */
+.item {
+  border: 1px solid rgba(185, 155, 35, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.itemOpen {
+  background: rgba(185, 155, 35, 0.04);
+  border-color: rgba(185, 155, 35, 0.28);
+}
+
+/* ─── Trigger ───────────────────────────────────────────────────────────────── */
+.trigger {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-lg);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
+
+.trigger:active {
+  transform: scale(0.995);
+}
+
+.triggerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.triggerTag {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-gold-dim);
+}
+
+.triggerTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+.triggerSummary {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+
+/* ─── Chevron ───────────────────────────────────────────────────────────────── */
+.chevron {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-top: 4px;
+  transition: transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Body (accordion content) ──────────────────────────────────────────────── */
+.body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.bodyOpen {
+  grid-template-rows: 1fr;
+}
+
+.bodyInner {
+  overflow: hidden;
+  padding: 0 var(--space-lg) 0 var(--space-lg);
+  transition: padding 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bodyOpen .bodyInner {
+  padding-bottom: var(--space-lg);
+}
+
+.bodyText {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--color-muted);
+  white-space: pre-line;
+  border-left: 2px solid rgba(185, 155, 35, 0.2);
+  padding-left: var(--space-md);
+}
+
+@media (max-width: 640px) {
+  .trigger {
+    padding: var(--space-md);
+  }
+
+  .bodyInner {
+    padding-inline: var(--space-md);
+  }
+}
