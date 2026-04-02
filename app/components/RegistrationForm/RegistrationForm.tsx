@@ -207,11 +207,50 @@ export default function RegistrationForm() {
     setStep(s => s - 1)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const errs = validateStep3(values)
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setSubmitting(true)
-    setTimeout(() => { setSubmitting(false); setSubmitted(true) }, 1500)
+    try {
+      await fetch('https://hook.eu2.make.com/i91qjrc7m18uj1coj8wlpjdsxolw5m3o', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          /* Qualification */
+          role:         values.role,
+          orgType:      values.orgType,
+          region:       values.region,
+          priority:     values.priority,
+          seats:        values.seats,
+          lane,
+          /* Budget */
+          budgetStatus:  values.budgetStatus,
+          timeframe:     values.timeframe,
+          contactPref:   values.contactPref,
+          invoiceNeeded: values.invoiceNeeded,
+          /* Contact */
+          fullName:      values.fullName,
+          jobTitle:      values.jobTitle,
+          organization:  values.organization,
+          country:       values.country,
+          email:         values.email,
+          whatsapp:      values.whatsapp,
+          teamSize:      values.teamSize || null,
+          /* Executive assistant */
+          execAssistName:     values.showExecAssist ? values.execAssistName     : null,
+          execAssistWhatsapp: values.showExecAssist ? values.execAssistWhatsapp : null,
+          execAssistEmail:    values.showExecAssist ? values.execAssistEmail    : null,
+          /* Meta */
+          submittedAt: new Date().toISOString(),
+          source:      'siccai-cape-town-summit',
+        }),
+      })
+      setSubmitted(true)
+    } catch {
+      setErrors({ fullName: 'Submission failed — please try again or email training@siccai.org' })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   /* ── Success state ── */
