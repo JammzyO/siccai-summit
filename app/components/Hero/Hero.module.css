@@ -235,7 +235,9 @@
 .ctaPrimary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 14px 32px;
+  min-width: 280px;
   font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 600;
@@ -271,8 +273,11 @@
 .ctaSecondary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
   padding: 14px 32px;
+  min-width: 280px;
   font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 500;
@@ -283,7 +288,6 @@
   border: 1px solid var(--color-gold);
   cursor: pointer;
   text-decoration: none;
-  white-space: nowrap;
   transition:
     background 200ms cubic-bezier(0.0, 0.0, 0.2, 1),
     color 200ms cubic-bezier(0.0, 0.0, 0.2, 1);
@@ -311,13 +315,6 @@
   text-transform: none;
   color: var(--color-gold-dim);
   margin-top: 2px;
-}
-
-/* CTAs layout — stack label + note vertically */
-.ctaSecondary {
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
 }
 
 /* ─── Divider ────────────────────────────────────────────────────────────────── */

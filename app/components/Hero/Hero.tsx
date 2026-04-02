@@ -112,7 +112,7 @@ export default function Hero() {
             href="#register"
             className={styles.ctaPrimary}
           >
-            Reserve My Seat — USD 3,000
+            Reserve My Seat
           </a>
           <a
             href="#register"
