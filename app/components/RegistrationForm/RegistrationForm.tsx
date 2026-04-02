@@ -237,6 +237,76 @@ export default function RegistrationForm() {
           execAssistEmail:    values.showExecAssist ? values.execAssistEmail    : '',
         }),
       })
+
+      if (values.contactPref === 'whatsapp') {
+        const ROLE_LABELS: Record<string, string> = {
+          ceo: 'Chief Executive Officer', director: 'Director', policy: 'Policy Maker / Regulator',
+          cyber: 'Cybersecurity Professional', other: 'Other',
+        }
+        const ORG_LABELS: Record<string, string> = {
+          government: 'Government', finance: 'Financial Services', telecom: 'Telecommunications',
+          health: 'Healthcare', education: 'Education', ngo: 'NGO / Development', private: 'Private Sector',
+        }
+        const REGION_LABELS: Record<string, string> = {
+          comesa: 'COMESA Member State', sadc: 'SADC Member State',
+          au_other: 'AU Member State (other)', outside: 'Outside Africa',
+        }
+        const PRIORITY_LABELS: Record<string, string> = {
+          availability: 'Service Availability & Business Continuity',
+          breach: 'Data Breach & Incident Response',
+          policy: 'Policy & Governance Frameworks',
+          ai: 'Responsible AI Adoption',
+          compliance: 'Regulatory Compliance',
+        }
+        const SEATS_LABELS: Record<string, string> = {
+          '1': '1 seat (Individual)', '2-5': '2–5 seats (Corporate)',
+          '6-15': '6–15 seats (Institutional)', '16+': '16+ seats (Strategic Partner)',
+        }
+        const BUDGET_LABELS: Record<string, string> = {
+          approved: 'Budget approved', 'in-progress': 'Budget approval in progress', 'not-yet': 'Not yet budgeted',
+        }
+        const TIMEFRAME_LABELS: Record<string, string> = {
+          '0-30': 'Ready to register within 30 days',
+          '31-90': 'Likely within 31–90 days',
+          '90+': 'Exploring — beyond 90 days',
+        }
+
+        const msg = [
+          `New registration — SICC AI Cape Town Summit`,
+          ``,
+          `Name: ${values.fullName}`,
+          `Job Title: ${values.jobTitle}`,
+          `Organisation: ${values.organization}`,
+          `Country: ${values.country}`,
+          `Email: ${values.email}`,
+          `WhatsApp: ${values.whatsapp}`,
+          ``,
+          `Role: ${ROLE_LABELS[values.role] || values.role}`,
+          `Organisation Type: ${ORG_LABELS[values.orgType] || values.orgType}`,
+          `Region: ${REGION_LABELS[values.region] || values.region}`,
+          `Main Priority: ${PRIORITY_LABELS[values.priority] || values.priority}`,
+          `Seats Required: ${SEATS_LABELS[values.seats] || values.seats}`,
+          ``,
+          `Budget Status: ${BUDGET_LABELS[values.budgetStatus] || values.budgetStatus}`,
+          `Decision Timeframe: ${TIMEFRAME_LABELS[values.timeframe] || values.timeframe}`,
+          `Preferred Contact: WhatsApp`,
+          `Invoice Required: ${values.invoiceNeeded ? 'Yes' : 'No'}`,
+          values.teamSize ? `Team Size: ${values.teamSize}` : '',
+          values.showExecAssist && values.execAssistName ? [
+            ``,
+            `Executive Assistant`,
+            `Name: ${values.execAssistName}`,
+            values.execAssistWhatsapp ? `WhatsApp: ${values.execAssistWhatsapp}` : '',
+            values.execAssistEmail    ? `Email: ${values.execAssistEmail}`        : '',
+          ].filter(Boolean).join('\n') : '',
+        ].filter(l => l !== undefined && !(l === '' && false)).join('\n').replace(/\n{3,}/g, '\n\n').trim()
+
+        window.open(
+          `https://wa.me/254720343201?text=${encodeURIComponent(msg)}`,
+          '_blank',
+        )
+      }
+
       setSubmitted(true)
     } catch {
       setErrors({ fullName: 'Submission failed — please try again or email training@siccai.org' })
