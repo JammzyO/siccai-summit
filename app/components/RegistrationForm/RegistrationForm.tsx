@@ -216,33 +216,25 @@ export default function RegistrationForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          /* Qualification */
-          role:         values.role,
-          orgType:      values.orgType,
-          region:       values.region,
-          priority:     values.priority,
-          seats:        values.seats,
-          lane,
-          /* Budget */
-          budgetStatus:  values.budgetStatus,
-          timeframe:     values.timeframe,
-          contactPref:   values.contactPref,
-          invoiceNeeded: values.invoiceNeeded,
-          /* Contact */
           fullName:      values.fullName,
           jobTitle:      values.jobTitle,
           organization:  values.organization,
           country:       values.country,
           email:         values.email,
           whatsapp:      values.whatsapp,
-          teamSize:      values.teamSize || null,
-          /* Executive assistant */
-          execAssistName:     values.showExecAssist ? values.execAssistName     : null,
-          execAssistWhatsapp: values.showExecAssist ? values.execAssistWhatsapp : null,
-          execAssistEmail:    values.showExecAssist ? values.execAssistEmail    : null,
-          /* Meta */
-          submittedAt: new Date().toISOString(),
-          source:      'siccai-cape-town-summit',
+          role:          values.role,
+          orgType:       values.orgType,
+          region:        values.region,
+          priority:      values.priority,
+          seats:         values.seats,
+          budgetStatus:  values.budgetStatus,
+          timeframe:     values.timeframe,
+          contactPref:   values.contactPref,
+          invoiceNeeded: values.invoiceNeeded,
+          teamSize:      values.teamSize || '',
+          execAssistName:     values.showExecAssist ? values.execAssistName     : '',
+          execAssistWhatsapp: values.showExecAssist ? values.execAssistWhatsapp : '',
+          execAssistEmail:    values.showExecAssist ? values.execAssistEmail    : '',
         }),
       })
       setSubmitted(true)
