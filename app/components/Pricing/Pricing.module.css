@@ -67,13 +67,26 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   align-items: stretch;
   gap: var(--space-sm);
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--container-pad);
   padding-block: 20px;
+}
+
+/* First 3 cards span 2 cols each → fills 6 columns */
+.card:nth-child(1),
+.card:nth-child(2),
+.card:nth-child(3) {
+  grid-column: span 2;
+}
+
+/* Last 2 cards span 3 cols each → fills 6 columns */
+.card:nth-child(4),
+.card:nth-child(5) {
+  grid-column: span 3;
 }
 
 /* ─── Card base ──────────────────────────────────────────────────────────────── */
@@ -106,11 +119,9 @@
   box-shadow: var(--shadow-md);
 }
 
-/* ─── Featured card (Corporate · middle) ────────────────────────────────────── */
+/* ─── Featured card (Individual · middle) ───────────────────────────────────── */
 .cardFeatured {
   border: 2px solid var(--color-gold);
-  margin-block: -20px;          /* extends above & below peers */
-  padding-block: calc(var(--space-md) + 20px); /* compensate so inner content stays padded */
   box-shadow: var(--shadow-gold);
   z-index: 1;
 }
@@ -160,9 +171,9 @@
 
 .tierLabel {
   font-family: var(--font-body);
-  font-size: 0.625rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-gold);
 }
@@ -479,15 +490,22 @@
 
 /* ─── Responsive ─────────────────────────────────────────────────────────────── */
 
-/* 3 → 2 at medium */
+/* 6-col → 2 at medium */
 @media (max-width: 960px) and (min-width: 641px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
     padding-block: 0;
   }
 
+  .card:nth-child(1),
+  .card:nth-child(2),
+  .card:nth-child(3),
+  .card:nth-child(4),
+  .card:nth-child(5) {
+    grid-column: span 1;
+  }
+
   .cardFeatured {
-    margin-block: 0;
     padding-block: var(--space-md);
   }
 }
@@ -500,8 +518,15 @@
     padding-block: 0;
   }
 
+  .card:nth-child(1),
+  .card:nth-child(2),
+  .card:nth-child(3),
+  .card:nth-child(4),
+  .card:nth-child(5) {
+    grid-column: span 1;
+  }
+
   .cardFeatured {
-    margin-block: 0;
     padding-block: var(--space-md);
   }
 
