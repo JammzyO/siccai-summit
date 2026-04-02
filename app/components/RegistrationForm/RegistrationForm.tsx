@@ -212,7 +212,7 @@ export default function RegistrationForm() {
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setSubmitting(true)
     try {
-      await fetch('https://hook.eu2.make.com/i91qjrc7m18uj1coj8wlpjdsxolw5m3o', {
+      await fetch('https://hook.eu2.make.com/9ui6srn3z482gs9k1wsnu3abdggtcpjp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
