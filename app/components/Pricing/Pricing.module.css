@@ -67,7 +67,7 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   align-items: stretch;
   gap: var(--space-sm);
   max-width: var(--container-max);
@@ -479,8 +479,8 @@
 
 /* ─── Responsive ─────────────────────────────────────────────────────────────── */
 
-/* 4 → 2 at medium */
-@media (max-width: 1024px) and (min-width: 641px) {
+/* 3 → 2 at medium */
+@media (max-width: 960px) and (min-width: 641px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
     padding-block: 0;
