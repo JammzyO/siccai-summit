@@ -251,6 +251,25 @@ export default function RegistrationForm() {
     setErrors(prev => { const n = { ...prev }; delete n[field]; return n })
   }, [])
 
+  /* Ticket card click — auto-advance, reset if switching ticket type */
+  const selectTicket = (id: TicketType) => {
+    const isSame = values.ticketType === id
+    if (isSame) {
+      /* Already on a later step with the same ticket — just advance to step 2 */
+      setErrors({})
+      setDirection('fwd')
+      setExitingStep(1)
+      setStep(2)
+      return
+    }
+    /* Different ticket selected — reset all answers, keep only new ticket */
+    setValues({ ...INITIAL, ticketType: id })
+    setErrors({})
+    setDirection('fwd')
+    setExitingStep(1)
+    setStep(2)
+  }
+
   const STEPS = 4
 
   const advance = () => {
@@ -512,7 +531,7 @@ export default function RegistrationForm() {
                         key={t.id}
                         type="button"
                         className={`${styles.ticketCard} ${values.ticketType === t.id ? styles.ticketCardSelected : ''}`}
-                        onClick={() => set('ticketType', t.id)}
+                        onClick={() => selectTicket(t.id)}
                         aria-pressed={values.ticketType === t.id}
                       >
                         <span className={styles.ticketLabel}>{t.label}</span>
@@ -530,23 +549,18 @@ export default function RegistrationForm() {
                     ))}
                   </div>
 
-                  {errors.ticketType && (
-                    <p className={styles.errorMsg} role="alert">{errors.ticketType}</p>
-                  )}
-
-                  <div className={styles.stepFooter}>
-                    <span />
-                    <button type="button" className={styles.continueBtn} onClick={advance}>
-                      Continue →
-                    </button>
-                  </div>
+                  <p className={styles.ticketHint}>Select a ticket to continue</p>
                 </>
               )}
 
               {/* ── Step 2: Qualify ── */}
               {step === 2 && (
                 <>
-                  <p className={styles.stepTitle}>Tell us about yourself</p>
+                  <p className={styles.stepTitle}>
+                    {values.ticketType === 'corporate'     ? 'About Your Organisation' :
+                     values.ticketType === 'institutional' ? 'About Your Institution' :
+                                                             'Tell us about yourself'}
+                  </p>
 
                   <SelectField
                     label="Your role" required
@@ -627,9 +641,12 @@ export default function RegistrationForm() {
 
                   {(values.ticketType === 'corporate' || values.ticketType === 'institutional') && (
                     <SelectField
-                      label="Number of seats" required
+                      label={values.ticketType === 'corporate'
+                        ? 'How many delegates will your organisation be sending?'
+                        : 'How many seats does your institution require?'}
+                      required
                       value={values.seats} onChange={v => set('seats', v as FormValues['seats'])}
-                      placeholder="Select number of seats…"
+                      placeholder="Select number of delegates…"
                       error={errors.seats}
                     >
                       {values.ticketType === 'corporate' && (
