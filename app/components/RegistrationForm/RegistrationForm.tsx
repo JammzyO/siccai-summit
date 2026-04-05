@@ -4,21 +4,28 @@ import { useState, useCallback } from 'react'
 import styles from './RegistrationForm.module.css'
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
-interface FormValues {
-  /* Step 1 — Qualify */
-  role:         '' | 'ceo' | 'director' | 'policy' | 'cyber' | 'other'
-  orgType:      '' | 'government' | 'finance' | 'telecom' | 'health' | 'education' | 'ngo' | 'private'
-  region:       '' | 'comesa' | 'sadc' | 'au_other' | 'outside'
-  priority:     '' | 'availability' | 'breach' | 'policy' | 'ai' | 'compliance'
-  seats:        '' | '1' | '2-5' | '6-15' | '16+'
+type TicketType = '' | 'individual' | 'corporate' | 'institutional' | 'networking'
 
-  /* Step 2 — Budget + Contact preference */
-  budgetStatus: '' | 'approved' | 'in-progress' | 'not-yet'
-  timeframe:    '' | '0-30' | '31-90' | '90+'
-  contactPref:  '' | 'whatsapp' | 'email' | 'assistant'
+interface FormValues {
+  /* Step 1 — Ticket */
+  ticketType: TicketType
+
+  /* Step 2 — Qualify */
+  role:           '' | 'ceo' | 'director' | 'policy' | 'cyber' | 'other'
+  orgType:        '' | 'government' | 'finance' | 'telecom' | 'health' | 'education' | 'ngo' | 'private' | 'other'
+  orgTypeOther:   string
+  region:         '' | 'comesa' | 'sadc' | 'au_other' | 'outside'
+  priority:       '' | 'availability' | 'breach' | 'policy' | 'ai' | 'compliance' | 'other'
+  priorityOther:  string
+  seats:          '' | '2-5' | '6-15' | '16+'   /* only for corporate/institutional */
+
+  /* Step 3 — Budget + contact pref */
+  budgetStatus:  '' | 'approved' | 'in-progress' | 'not-yet'
+  timeframe:     '' | '0-30' | '31-90' | '90+'
+  contactPref:   '' | 'whatsapp' | 'email' | 'assistant'
   invoiceNeeded: boolean
 
-  /* Step 3 — Contact details */
+  /* Step 4 — Contact details */
   fullName:           string
   jobTitle:           string
   organization:       string
@@ -35,7 +42,8 @@ interface FormValues {
 type Errors = Partial<Record<keyof FormValues, string>>
 
 const INITIAL: FormValues = {
-  role: '', orgType: '', region: '', priority: '', seats: '',
+  ticketType: '',
+  role: '', orgType: '', orgTypeOther: '', region: '', priority: '', priorityOther: '', seats: '',
   budgetStatus: '', timeframe: '', contactPref: '', invoiceNeeded: false,
   fullName: '', jobTitle: '', organization: '', country: '', email: '',
   whatsapp: '', teamSize: '', execAssistName: '', execAssistWhatsapp: '',
@@ -43,26 +51,68 @@ const INITIAL: FormValues = {
 }
 
 /* ─── Lane routing ───────────────────────────────────────────────────────────── */
-type Lane = 'individual' | 'team' | 'partner'
+type Lane = 'individual' | 'team' | 'partner' | 'networking'
 
 function getLane(values: FormValues): Lane {
-  if (values.role === 'policy' || values.seats === '16+') return 'partner'
-  if (values.seats === '1' || values.seats === '') return 'individual'
-  return 'team'
+  if (values.ticketType === 'networking') return 'networking'
+  if (values.ticketType === 'institutional' || values.seats === '16+') return 'partner'
+  if (values.ticketType === 'corporate') return 'team'
+  return 'individual'
 }
+
+/* ─── Ticket options ─────────────────────────────────────────────────────────── */
+const TICKETS: { id: TicketType; label: string; sub: string; price: string | null; note: string }[] = [
+  {
+    id:    'individual',
+    label: 'Main Event · Individual',
+    sub:   '11–14 May 2026 · 4 days',
+    price: '2,740',
+    note:  'per seat',
+  },
+  {
+    id:    'corporate',
+    label: 'Main Event · Corporate',
+    sub:   '2–5 seats · 11–14 May 2026',
+    price: '2,270',
+    note:  'per seat',
+  },
+  {
+    id:    'institutional',
+    label: 'Institutional Package',
+    sub:   '6–15 seats · contact us',
+    price: null,
+    note:  '',
+  },
+  {
+    id:    'networking',
+    label: 'Networking Event Only',
+    sub:   '15 May 2026',
+    price: '1,175',
+    note:  'per person',
+  },
+]
 
 /* ─── Validation ─────────────────────────────────────────────────────────────── */
 function validateStep1(v: FormValues): Errors {
   const e: Errors = {}
-  if (!v.role)     e.role     = 'Please select your role'
-  if (!v.orgType)  e.orgType  = 'Please select your organisation type'
-  if (!v.region)   e.region   = 'Please select your region'
-  if (!v.priority) e.priority = 'Please select your main priority'
-  if (!v.seats)    e.seats    = 'Please select the number of seats needed'
+  if (!v.ticketType) e.ticketType = 'Please select a ticket type'
   return e
 }
 
 function validateStep2(v: FormValues): Errors {
+  const e: Errors = {}
+  if (!v.role)     e.role     = 'Please select your role'
+  if (!v.orgType)  e.orgType  = 'Please select your organisation type'
+  if (v.orgType === 'other' && !v.orgTypeOther.trim()) e.orgTypeOther = 'Please describe your organisation'
+  if (!v.region)   e.region   = 'Please select your region'
+  if (!v.priority) e.priority = 'Please select your main priority'
+  if (v.priority === 'other' && !v.priorityOther.trim()) e.priorityOther = 'Please describe your priority'
+  if ((v.ticketType === 'corporate' || v.ticketType === 'institutional') && !v.seats)
+    e.seats = 'Please select the number of seats'
+  return e
+}
+
+function validateStep3(v: FormValues): Errors {
   const e: Errors = {}
   if (!v.budgetStatus) e.budgetStatus = 'Please select a budget status'
   if (!v.timeframe)    e.timeframe    = 'Please select a timeframe'
@@ -70,7 +120,7 @@ function validateStep2(v: FormValues): Errors {
   return e
 }
 
-function validateStep3(v: FormValues): Errors {
+function validateStep4(v: FormValues): Errors {
   const e: Errors = {}
   if (!v.fullName.trim())     e.fullName     = 'Full name is required'
   if (!v.jobTitle.trim())     e.jobTitle     = 'Job title is required'
@@ -80,7 +130,7 @@ function validateStep3(v: FormValues): Errors {
     e.email = 'Email address is required'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))
     e.email = 'Enter a valid email address'
-  if (!v.whatsapp.trim())     e.whatsapp     = 'WhatsApp number is required'
+  if (!v.whatsapp.trim()) e.whatsapp = 'WhatsApp number is required'
   return e
 }
 
@@ -142,6 +192,16 @@ function CheckDot() {
 }
 
 function LaneOutcome({ lane, values }: { lane: Lane; values: FormValues }) {
+  if (lane === 'networking') {
+    return (
+      <div className={styles.laneOutcome}>
+        <p className={styles.laneOutcomeTitle}>Your next step</p>
+        <p className={styles.laneOutcomeBody}>
+          Our team will contact you within 24 hours with payment details and logistics for your Networking Event seat on 15 May 2026.
+        </p>
+      </div>
+    )
+  }
   if (lane === 'individual') {
     return (
       <div className={styles.laneOutcome}>
@@ -166,9 +226,9 @@ function LaneOutcome({ lane, values }: { lane: Lane; values: FormValues }) {
   }
   return (
     <div className={styles.laneOutcome}>
-      <p className={styles.laneOutcomeTitle}>Partnership &amp; Membership Inquiry</p>
+      <p className={styles.laneOutcomeTitle}>Institutional &amp; Partnership Inquiry</p>
       <p className={styles.laneOutcomeBody}>
-        Your inquiry has been flagged for a Partnership / Membership call (30 min). Our team will be in touch within 24 hours to discuss institutional engagement, MoU opportunities, and ongoing capability building.
+        Your inquiry has been received. Our team will be in touch within 24 hours to discuss institutional seat allocation, invoice arrangements, and any MoU or partnership opportunities.
       </p>
     </div>
   )
@@ -191,8 +251,13 @@ export default function RegistrationForm() {
     setErrors(prev => { const n = { ...prev }; delete n[field]; return n })
   }, [])
 
+  const STEPS = 4
+
   const advance = () => {
-    const errs = step === 1 ? validateStep1(values) : step === 2 ? validateStep2(values) : {}
+    const errs =
+      step === 1 ? validateStep1(values) :
+      step === 2 ? validateStep2(values) :
+      step === 3 ? validateStep3(values) : {}
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setErrors({})
     setDirection('fwd')
@@ -208,14 +273,20 @@ export default function RegistrationForm() {
   }
 
   const handleSubmit = async () => {
-    const errs = validateStep3(values)
+    const errs = validateStep4(values)
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setSubmitting(true)
     try {
+      const seatsValue =
+        values.ticketType === 'individual' ? '1' :
+        values.ticketType === 'networking' ? 'networking only' :
+        values.seats
+
       await fetch('https://hook.eu2.make.com/9ui6srn3z482gs9k1wsnu3abdggtcpjp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          ticketType:    values.ticketType,
           fullName:      values.fullName,
           jobTitle:      values.jobTitle,
           organization:  values.organization,
@@ -223,10 +294,10 @@ export default function RegistrationForm() {
           email:         values.email,
           whatsapp:      values.whatsapp,
           role:          values.role,
-          orgType:       values.orgType,
+          orgType:       values.orgType === 'other' ? `Other: ${values.orgTypeOther}` : values.orgType,
           region:        values.region,
-          priority:      values.priority,
-          seats:         values.seats,
+          priority:      values.priority === 'other' ? `Other: ${values.priorityOther}` : values.priority,
+          seats:         seatsValue,
           budgetStatus:  values.budgetStatus,
           timeframe:     values.timeframe,
           contactPref:   values.contactPref,
@@ -239,31 +310,42 @@ export default function RegistrationForm() {
       })
 
       if (values.contactPref === 'whatsapp') {
+        const TICKET_LABELS: Record<string, string> = {
+          individual:    'Main Event · Individual (USD 2,740)',
+          corporate:     'Main Event · Corporate (USD 2,270 per seat)',
+          institutional: 'Institutional Package (6–15 seats)',
+          networking:    'Networking Event Only (USD 1,175)',
+        }
         const ROLE_LABELS: Record<string, string> = {
-          ceo: 'Chief Executive Officer', director: 'Director', policy: 'Policy Maker / Regulator',
-          cyber: 'Cybersecurity Professional', other: 'Other',
+          ceo: 'Chief Executive Officer / Managing Director',
+          director: 'Director / Head of Department',
+          policy: 'Policy Maker / Regulator',
+          cyber: 'Cybersecurity / IT Lead',
+          other: 'Other Senior Role',
         }
         const ORG_LABELS: Record<string, string> = {
-          government: 'Government', finance: 'Financial Services', telecom: 'Telecommunications',
-          health: 'Healthcare', education: 'Education', ngo: 'NGO / Development', private: 'Private Sector',
+          government: 'Government / Agency', finance: 'Bank / Financial Services',
+          telecom: 'Telecom / ISP', health: 'Healthcare', education: 'Education',
+          ngo: 'NGO / Development', private: 'Private Company',
         }
         const REGION_LABELS: Record<string, string> = {
           comesa: 'COMESA Member State', sadc: 'SADC Member State',
-          au_other: 'AU Member State (other)', outside: 'Outside Africa',
+          au_other: 'Other AU Member State', outside: 'Outside Africa',
         }
         const PRIORITY_LABELS: Record<string, string> = {
-          availability: 'Service Availability & Business Continuity',
-          breach: 'Data Breach & Incident Response',
-          policy: 'Policy & Governance Frameworks',
-          ai: 'Responsible AI Adoption',
-          compliance: 'Regulatory Compliance',
+          availability: 'Reduce service disruption / downtime',
+          breach: 'Prevent data loss / breach',
+          policy: 'Build Cybersecurity policy and controls',
+          ai: 'Govern AI adoption / misinformation risk',
+          compliance: 'Meet regulatory and cross-border compliance',
         }
         const SEATS_LABELS: Record<string, string> = {
-          '1': '1 seat (Individual)', '2-5': '2–5 seats (Corporate)',
-          '6-15': '6–15 seats (Institutional)', '16+': '16+ seats (Strategic Partner)',
+          '2-5': '2–5 seats', '6-15': '6–15 seats', '16+': '16+ seats',
         }
         const BUDGET_LABELS: Record<string, string> = {
-          approved: 'Budget approved', 'in-progress': 'Budget approval in progress', 'not-yet': 'Not yet budgeted',
+          approved: 'Budget approved',
+          'in-progress': 'Budget approval in progress',
+          'not-yet': 'Not yet budgeted',
         }
         const TIMEFRAME_LABELS: Record<string, string> = {
           '0-30': 'Ready to register now',
@@ -271,8 +353,25 @@ export default function RegistrationForm() {
           '90+': 'Still exploring options',
         }
 
+        const orgTypeDisplay =
+          values.orgType === 'other'
+            ? `Other — ${values.orgTypeOther}`
+            : (ORG_LABELS[values.orgType] || values.orgType)
+
+        const priorityDisplay =
+          values.priority === 'other'
+            ? `Other — ${values.priorityOther}`
+            : (PRIORITY_LABELS[values.priority] || values.priority)
+
+        const seatsDisplay =
+          values.ticketType === 'individual' ? '1 seat' :
+          values.ticketType === 'networking' ? 'Networking only' :
+          (SEATS_LABELS[values.seats] || values.seats)
+
         const msg = [
           `New registration — SICC AI Cape Town Summit`,
+          ``,
+          `Ticket: ${TICKET_LABELS[values.ticketType] || values.ticketType}`,
           ``,
           `Name: ${values.fullName}`,
           `Job Title: ${values.jobTitle}`,
@@ -282,16 +381,17 @@ export default function RegistrationForm() {
           `WhatsApp: ${values.whatsapp}`,
           ``,
           `Role: ${ROLE_LABELS[values.role] || values.role}`,
-          `Organisation Type: ${ORG_LABELS[values.orgType] || values.orgType}`,
+          `Organisation Type: ${orgTypeDisplay}`,
           `Region: ${REGION_LABELS[values.region] || values.region}`,
-          `Main Priority: ${PRIORITY_LABELS[values.priority] || values.priority}`,
-          `Seats Required: ${SEATS_LABELS[values.seats] || values.seats}`,
+          `Main Priority: ${priorityDisplay}`,
+          values.ticketType !== 'individual' && values.ticketType !== 'networking'
+            ? `Seats Required: ${seatsDisplay}` : '',
           ``,
           `Budget Status: ${BUDGET_LABELS[values.budgetStatus] || values.budgetStatus}`,
-          `Decision Timeframe: ${TIMEFRAME_LABELS[values.timeframe] || values.timeframe}`,
+          `Registration Timeline: ${TIMEFRAME_LABELS[values.timeframe] || values.timeframe}`,
           `Preferred Contact: WhatsApp`,
           `Invoice Required: ${values.invoiceNeeded ? 'Yes' : 'No'}`,
-          values.teamSize ? `Team Size: ${values.teamSize}` : '',
+          values.teamSize ? `Team Size Confirmed: ${values.teamSize}` : '',
           values.showExecAssist && values.execAssistName ? [
             ``,
             `Executive Assistant`,
@@ -299,7 +399,7 @@ export default function RegistrationForm() {
             values.execAssistWhatsapp ? `WhatsApp: ${values.execAssistWhatsapp}` : '',
             values.execAssistEmail    ? `Email: ${values.execAssistEmail}`        : '',
           ].filter(Boolean).join('\n') : '',
-        ].filter(l => l !== undefined && !(l === '' && false)).join('\n').replace(/\n{3,}/g, '\n\n').trim()
+        ].filter(Boolean).join('\n').replace(/\n{3,}/g, '\n\n').trim()
 
         window.open(
           `https://wa.me/254720343201?text=${encodeURIComponent(msg)}`,
@@ -323,7 +423,9 @@ export default function RegistrationForm() {
           <div className={styles.success}>
             <div className={styles.successIcon}><SuccessIcon /></div>
             <h2 className={styles.successHeading}>
-              {lane === 'individual' ? 'Seat Reserved' : lane === 'team' ? 'Briefing Requested' : 'Inquiry Received'}
+              {lane === 'individual' ? 'Seat Reserved' :
+               lane === 'team'      ? 'Briefing Requested' :
+               lane === 'networking'? 'Place Reserved' : 'Inquiry Received'}
             </h2>
             <p className={styles.successMessage}>
               Thank you, {values.fullName.split(' ')[0]}. Our team will be in touch within 24 hours with payment and logistics details.
@@ -335,10 +437,7 @@ export default function RegistrationForm() {
     )
   }
 
-  const laneLabel =
-    lane === 'individual' ? 'Individual Seat — USD 2,740' :
-    lane === 'team'       ? 'Corporate / Team Seats — from USD 2,270 per seat' :
-                            'Institutional / Partnership Inquiry'
+  const STEP_LABELS = ['Ticket', 'About You', 'Budget', 'Contact']
 
   return (
     <section id="register" className={styles.section} aria-labelledby="form-heading">
@@ -347,24 +446,30 @@ export default function RegistrationForm() {
         <header className={styles.header}>
           <h2 id="form-heading" className={styles.heading}>Reserve Your Place</h2>
           <p className={styles.subText}>
-            Complete the qualification form below. Our team responds within 24 hours.
+            Complete the form below. Our team responds within 24 hours.
           </p>
         </header>
 
         <div className={styles.formWrap}>
 
           {/* Lane indicator */}
-          {step >= 2 && values.seats && (
+          {step >= 2 && values.ticketType && (
             <div className={styles.laneIndicator} aria-live="polite">
               <span className={styles.laneDot} aria-hidden="true" />
-              <span className={styles.laneLabel}>{laneLabel}</span>
+              <span className={styles.laneLabel}>
+                {values.ticketType === 'individual'    ? 'Main Event · Individual — USD 2,740' :
+                 values.ticketType === 'corporate'     ? 'Main Event · Corporate — USD 2,270 per seat' :
+                 values.ticketType === 'institutional' ? 'Institutional Package — contact us for pricing' :
+                                                         'Networking Event Only — USD 1,175'}
+              </span>
             </div>
           )}
 
           {/* Progress */}
           <nav className={styles.progress} aria-label="Registration steps">
-            {[{ num: 1, label: 'Qualify' }, { num: 2, label: 'Budget' }, { num: 3, label: 'Contact' }].map(
-              ({ num, label }, i, arr) => (
+            {STEP_LABELS.map((label, i) => {
+              const num = i + 1
+              return (
                 <div key={num} className={styles.progressItem}>
                   <div
                     className={`${styles.progressDot} ${step >= num ? styles.progressDotActive : ''}`}
@@ -375,12 +480,12 @@ export default function RegistrationForm() {
                   <span className={`${styles.progressLabel} ${step === num ? styles.progressLabelActive : ''}`}>
                     {label}
                   </span>
-                  {i < arr.length - 1 && (
+                  {i < STEP_LABELS.length - 1 && (
                     <div className={`${styles.progressLine} ${step > num ? styles.progressLineFilled : ''}`} aria-hidden="true" />
                   )}
                 </div>
               )
-            )}
+            })}
           </nav>
 
           {/* Step panels */}
@@ -396,8 +501,50 @@ export default function RegistrationForm() {
 
             <div className={styles.stepActive} data-dir={direction} key={step}>
 
-              {/* ── Step 1: Qualify ── */}
+              {/* ── Step 1: Ticket selection ── */}
               {step === 1 && (
+                <>
+                  <p className={styles.stepTitle}>Which ticket are you interested in?</p>
+
+                  <div className={styles.ticketGrid} role="group" aria-label="Ticket type">
+                    {TICKETS.map(t => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        className={`${styles.ticketCard} ${values.ticketType === t.id ? styles.ticketCardSelected : ''}`}
+                        onClick={() => set('ticketType', t.id)}
+                        aria-pressed={values.ticketType === t.id}
+                      >
+                        <span className={styles.ticketLabel}>{t.label}</span>
+                        <span className={styles.ticketSub}>{t.sub}</span>
+                        {t.price ? (
+                          <span className={styles.ticketPrice}>
+                            <span className={styles.ticketCurrency}>USD</span>
+                            {t.price}
+                            <span className={styles.ticketNote}> {t.note}</span>
+                          </span>
+                        ) : (
+                          <span className={styles.ticketPriceContact}>Contact Us</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+
+                  {errors.ticketType && (
+                    <p className={styles.errorMsg} role="alert">{errors.ticketType}</p>
+                  )}
+
+                  <div className={styles.stepFooter}>
+                    <span />
+                    <button type="button" className={styles.continueBtn} onClick={advance}>
+                      Continue →
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* ── Step 2: Qualify ── */}
+              {step === 2 && (
                 <>
                   <p className={styles.stepTitle}>Tell us about yourself</p>
 
@@ -407,7 +554,7 @@ export default function RegistrationForm() {
                     placeholder="Select your role…"
                     error={errors.role}
                   >
-                    <option value="ceo">CEO / MD</option>
+                    <option value="ceo">CEO / Managing Director</option>
                     <option value="director">Director / Head of Department</option>
                     <option value="policy">Policy Maker / Regulator</option>
                     <option value="cyber">Cybersecurity / IT Lead</option>
@@ -425,9 +572,21 @@ export default function RegistrationForm() {
                     <option value="telecom">Telecom / ISP</option>
                     <option value="health">Healthcare</option>
                     <option value="education">Education</option>
-                    <option value="ngo">NGO / Development</option>
+                    <option value="ngo">NGO / Development Organisation</option>
                     <option value="private">Private Company</option>
+                    <option value="other">Other</option>
                   </SelectField>
+
+                  {values.orgType === 'other' && (
+                    <Field label="Please describe your organisation" required error={errors.orgTypeOther}>
+                      <input
+                        className={`${styles.input} ${errors.orgTypeOther ? styles.inputError : ''}`}
+                        value={values.orgTypeOther}
+                        onChange={e => set('orgTypeOther', e.target.value)}
+                        placeholder="e.g. Regional development bank"
+                      />
+                    </Field>
+                  )}
 
                   <SelectField
                     label="Your region" required
@@ -449,44 +608,51 @@ export default function RegistrationForm() {
                   >
                     <option value="availability">Reduce service disruption / downtime</option>
                     <option value="breach">Prevent data loss / breach</option>
-                    <option value="policy">Build Cybersecurity policy and controls</option>
+                    <option value="policy">Build cybersecurity policy and controls</option>
                     <option value="ai">Govern AI adoption / misinformation risk</option>
                     <option value="compliance">Meet regulatory and cross-border compliance</option>
+                    <option value="other">Other</option>
                   </SelectField>
 
-                  <SelectField
-                    label="Training seats needed" required
-                    value={values.seats} onChange={v => set('seats', v as FormValues['seats'])}
-                    placeholder="Select number of seats…"
-                    error={errors.seats}
-                  >
-                    <option value="1">1 seat — Individual</option>
-                    <option value="2-5">2–5 seats — Team</option>
-                    <option value="6-15">6–15 seats — Institutional</option>
-                    <option value="16+">16+ seats — Partnership</option>
-                  </SelectField>
+                  {values.priority === 'other' && (
+                    <Field label="Please describe your main priority" required error={errors.priorityOther}>
+                      <input
+                        className={`${styles.input} ${errors.priorityOther ? styles.inputError : ''}`}
+                        value={values.priorityOther}
+                        onChange={e => set('priorityOther', e.target.value)}
+                        placeholder="e.g. Board-level AI governance framework"
+                      />
+                    </Field>
+                  )}
 
-                  {values.seats === '1' && (
-                    <p className={styles.routeHint}>→ Individual seat path: checkout + invoice option</p>
-                  )}
-                  {(values.seats === '2-5' || values.seats === '6-15') && (
-                    <p className={styles.routeHint}>→ Team path: we will schedule your Executive Briefing (20 min)</p>
-                  )}
-                  {values.seats === '16+' && (
-                    <p className={styles.routeHint}>→ Partnership path: we will schedule a Membership / MoU call (30 min)</p>
+                  {(values.ticketType === 'corporate' || values.ticketType === 'institutional') && (
+                    <SelectField
+                      label="Number of seats" required
+                      value={values.seats} onChange={v => set('seats', v as FormValues['seats'])}
+                      placeholder="Select number of seats…"
+                      error={errors.seats}
+                    >
+                      {values.ticketType === 'corporate' && (
+                        <option value="2-5">2–5 seats</option>
+                      )}
+                      {values.ticketType === 'institutional' && (
+                        <>
+                          <option value="6-15">6–15 seats</option>
+                          <option value="16+">16+ seats</option>
+                        </>
+                      )}
+                    </SelectField>
                   )}
 
                   <div className={styles.stepFooter}>
-                    <span />
-                    <button type="button" className={styles.continueBtn} onClick={advance}>
-                      Continue →
-                    </button>
+                    <button type="button" className={styles.backBtn} onClick={back}>← Back</button>
+                    <button type="button" className={styles.continueBtn} onClick={advance}>Continue →</button>
                   </div>
                 </>
               )}
 
-              {/* ── Step 2: Budget + Contact preference ── */}
-              {step === 2 && (
+              {/* ── Step 3: Budget + Contact preference ── */}
+              {step === 3 && (
                 <>
                   <p className={styles.stepTitle}>Budget &amp; Contact Preference</p>
 
@@ -523,7 +689,7 @@ export default function RegistrationForm() {
                     <option value="assistant">Via my Executive Assistant</option>
                   </SelectField>
 
-                  {lane === 'individual' && (
+                  {(values.ticketType === 'individual' || values.ticketType === 'corporate' || values.ticketType === 'institutional') && (
                     <div className={styles.fieldGroup}>
                       <label className={styles.checkboxRow}>
                         <input
@@ -547,8 +713,8 @@ export default function RegistrationForm() {
                 </>
               )}
 
-              {/* ── Step 3: Contact details ── */}
-              {step === 3 && (
+              {/* ── Step 4: Contact details ── */}
+              {step === 4 && (
                 <>
                   <p className={styles.stepTitle}>Your Contact Details</p>
 
@@ -614,14 +780,14 @@ export default function RegistrationForm() {
                   </Field>
 
                   {(lane === 'team' || lane === 'partner') && (
-                    <Field label="Number of team members attending" error={undefined}>
+                    <Field label="Exact number of team members attending" error={undefined}>
                       <input
                         className={styles.input}
                         type="number"
                         min="2"
                         value={values.teamSize}
                         onChange={e => set('teamSize', e.target.value)}
-                        placeholder="e.g. 5"
+                        placeholder="e.g. 4"
                       />
                     </Field>
                   )}
@@ -686,8 +852,9 @@ export default function RegistrationForm() {
                       <><span className={styles.spinner} aria-hidden="true" /><span>Submitting…</span></>
                     ) : (
                       lane === 'individual' ? 'Reserve My Seat' :
-                      lane === 'team'       ? 'Request Executive Briefing' :
-                                             'Submit Partnership Inquiry'
+                      lane === 'networking' ? 'Reserve Networking Place' :
+                      lane === 'team'       ? 'Book Team Seats' :
+                                             'Submit Institutional Inquiry'
                     )}
                   </button>
 

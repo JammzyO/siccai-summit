@@ -54,7 +54,7 @@ const TIERS = [
     featured:  false,
     ribbon:    false,
     ribbonText: '',
-    ctaLabel:  'Book Executive Briefing',
+    ctaLabel:  'Book Team Seats',
     ctaHref:   '#register',
     delay:     200,
     inclusions: [
