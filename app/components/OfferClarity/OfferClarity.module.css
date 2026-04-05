@@ -177,6 +177,35 @@
   gap: var(--space-md);
 }
 
+.priceGrid {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.priceItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.priceLabel {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(201, 168, 76, 0.7);
+}
+
+.priceDivider {
+  width: 1px;
+  height: 48px;
+  background: rgba(201, 168, 76, 0.2);
+  flex-shrink: 0;
+}
+
 .ctaPrice {
   display: flex;
   align-items: baseline;

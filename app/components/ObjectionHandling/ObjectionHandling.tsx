@@ -38,10 +38,9 @@ Your IT team is not your audience — you are.`,
   significant and increasing
 • Reputational loss from an AI misinformation incident: unquantifiable
 
-The Summit Training seat (USD 3,000) includes:
+Your Summit seat (from USD 2,270 for corporates / USD 2,740 for individuals) includes:
 • Executive workbook + governance templates you apply immediately
 • Certificate + institutional letter for budget approval processes
-• Post-event 30-day implementation clinic (2 group sessions)
 • Clarity Guarantee: full refund in writing before Day 2 if you cannot
   identify at least 5 priority actions for your institution
 

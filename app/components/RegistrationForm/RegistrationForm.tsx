@@ -266,9 +266,9 @@ export default function RegistrationForm() {
           approved: 'Budget approved', 'in-progress': 'Budget approval in progress', 'not-yet': 'Not yet budgeted',
         }
         const TIMEFRAME_LABELS: Record<string, string> = {
-          '0-30': 'Ready to register within 30 days',
-          '31-90': 'Likely within 31–90 days',
-          '90+': 'Exploring — beyond 90 days',
+          '0-30': 'Ready to register now',
+          '31-90': 'Within the next month',
+          '90+': 'Still exploring options',
         }
 
         const msg = [
@@ -336,9 +336,9 @@ export default function RegistrationForm() {
   }
 
   const laneLabel =
-    lane === 'individual' ? 'Individual Seat — USD 3,000' :
-    lane === 'team'       ? 'Team / Institution — Executive Briefing' :
-                            'Partnership / Membership Inquiry'
+    lane === 'individual' ? 'Individual Seat — USD 2,740' :
+    lane === 'team'       ? 'Corporate / Team Seats — from USD 2,270 per seat' :
+                            'Institutional / Partnership Inquiry'
 
   return (
     <section id="register" className={styles.section} aria-labelledby="form-heading">
@@ -502,14 +502,14 @@ export default function RegistrationForm() {
                   </SelectField>
 
                   <SelectField
-                    label="When do you need this implemented?" required
+                    label="When are you planning to register?" required
                     value={values.timeframe} onChange={v => set('timeframe', v as FormValues['timeframe'])}
                     placeholder="Select timeframe…"
                     error={errors.timeframe}
                   >
-                    <option value="0-30">Within 30 days</option>
-                    <option value="31-90">31–90 days</option>
-                    <option value="90+">90+ days</option>
+                    <option value="0-30">Ready to register now</option>
+                    <option value="31-90">Within the next month</option>
+                    <option value="90+">Still exploring options</option>
                   </SelectField>
 
                   <SelectField

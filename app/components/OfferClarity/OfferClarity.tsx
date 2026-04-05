@@ -82,17 +82,38 @@ export default function OfferClarity() {
 
         {/* CTA */}
         <div className={styles.ctaBlock}>
-          <p className={styles.ctaPrice}>
-            <span className={styles.ctaCurrency}>USD</span>
-            <span className={styles.ctaAmount}>3,000</span>
-            <span className={styles.ctaNote}>per seat</span>
-          </p>
+          <div className={styles.priceGrid}>
+            <div className={styles.priceItem}>
+              <span className={styles.priceLabel}>Main Event · Individuals</span>
+              <p className={styles.ctaPrice}>
+                <span className={styles.ctaCurrency}>USD</span>
+                <span className={styles.ctaAmount}>2,740</span>
+              </p>
+            </div>
+            <div className={styles.priceDivider} aria-hidden="true" />
+            <div className={styles.priceItem}>
+              <span className={styles.priceLabel}>Main Event · Corporates</span>
+              <p className={styles.ctaPrice}>
+                <span className={styles.ctaCurrency}>USD</span>
+                <span className={styles.ctaAmount}>2,270</span>
+                <span className={styles.ctaNote}>per seat</span>
+              </p>
+            </div>
+            <div className={styles.priceDivider} aria-hidden="true" />
+            <div className={styles.priceItem}>
+              <span className={styles.priceLabel}>Networking Event Only</span>
+              <p className={styles.ctaPrice}>
+                <span className={styles.ctaCurrency}>USD</span>
+                <span className={styles.ctaAmount}>1,175</span>
+              </p>
+            </div>
+          </div>
           <div className={styles.ctaRow}>
             <a href="#register" className={styles.ctaPrimary}>
               Reserve My Seat
             </a>
-            <a href="#register" className={styles.ctaSecondary}>
-              Book an Executive Briefing
+            <a href="#pricing" className={styles.ctaSecondary}>
+              View All Pricing
             </a>
           </div>
           <p className={styles.ctaInvoice}>
