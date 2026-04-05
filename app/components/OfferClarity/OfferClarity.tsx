@@ -109,10 +109,25 @@ export default function OfferClarity() {
             </div>
           </div>
           <div className={styles.ctaRow}>
-            <a href="#register" className={styles.ctaPrimary}>
+            <a
+              href="#register"
+              className={styles.ctaPrimary}
+              onClick={e => {
+                e.preventDefault()
+                sessionStorage.setItem('preselected_ticket', 'individual')
+                document.getElementById('register')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
+            >
               Reserve My Seat
             </a>
-            <a href="#pricing" className={styles.ctaSecondary}>
+            <a
+              href="#pricing"
+              className={styles.ctaSecondary}
+              onClick={e => {
+                e.preventDefault()
+                document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
+            >
               View All Pricing
             </a>
           </div>

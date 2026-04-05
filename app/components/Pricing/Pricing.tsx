@@ -200,6 +200,9 @@ export default function Pricing() {
               className={`${styles.ctaBase} ${featured ? styles.ctaSolidGold : styles.ctaOutlined}`}
               onClick={e => {
                 e.preventDefault()
+                if (['individual','corporate','institutional','networking'].includes(id)) {
+                  sessionStorage.setItem('preselected_ticket', id)
+                }
                 document.querySelector(ctaHref)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
             >

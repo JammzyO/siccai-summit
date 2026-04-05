@@ -947,6 +947,136 @@
   margin-top: 4px;
 }
 
+/* ─── Radio cards ────────────────────────────────────────────────────────────── */
+.radioGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.radioCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--color-border);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms cubic-bezier(0.4,0,0.2,1),
+              background   180ms cubic-bezier(0.4,0,0.2,1);
+}
+
+.radioCard:hover {
+  border-color: rgba(201,168,76,0.35);
+  background: rgba(201,168,76,0.04);
+}
+
+.radioCard:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.radioCardSelected {
+  border-color: var(--color-gold);
+  background: rgba(201,168,76,0.07);
+}
+
+.radioCheck {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: background 180ms, border-color 180ms;
+}
+
+.radioCardSelected .radioCheck {
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+}
+
+.radioLabel {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+/* ─── Number stepper ────────────────────────────────────────────────────────── */
+.stepper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  width: fit-content;
+  min-width: 160px;
+  margin-top: 6px;
+  transition: border-color 180ms;
+}
+
+.stepper:focus-within {
+  border-color: var(--color-gold);
+}
+
+.stepperError {
+  border-color: #e05050;
+}
+
+.stepperBtn {
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.04);
+  border: none;
+  color: var(--color-gold);
+  font-size: 1.25rem;
+  font-weight: 300;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 150ms;
+  line-height: 1;
+}
+
+.stepperBtn:hover:not(:disabled) {
+  background: rgba(201,168,76,0.12);
+}
+
+.stepperBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.stepperInput {
+  flex: 1;
+  height: 44px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.stepperInput::-webkit-inner-spin-button,
+.stepperInput::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+@media (max-width: 520px) {
+  .radioGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 520px) {
   .ticketGrid {
     grid-template-columns: 1fr;

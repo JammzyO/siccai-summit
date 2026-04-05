@@ -111,12 +111,22 @@ export default function Hero() {
           <a
             href="#register"
             className={styles.ctaPrimary}
+            onClick={e => {
+              e.preventDefault()
+              sessionStorage.setItem('preselected_ticket', 'individual')
+              document.getElementById('register')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }}
           >
             Reserve My Seat
           </a>
           <a
             href="#register"
             className={styles.ctaSecondary}
+            onClick={e => {
+              e.preventDefault()
+              sessionStorage.setItem('preselected_ticket', 'corporate')
+              document.getElementById('register')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }}
           >
             Book an Executive Briefing
             <span className={styles.ctaSecondaryNote}>(Teams / Institutions)</span>
