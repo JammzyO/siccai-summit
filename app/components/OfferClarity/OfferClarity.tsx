@@ -115,6 +115,7 @@ export default function OfferClarity() {
               onClick={e => {
                 e.preventDefault()
                 sessionStorage.setItem('preselected_ticket', 'individual')
+                window.dispatchEvent(new CustomEvent('preselect-ticket', { detail: { ticket: 'individual' } }))
                 document.getElementById('register')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
             >

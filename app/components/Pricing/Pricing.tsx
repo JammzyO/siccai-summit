@@ -202,6 +202,7 @@ export default function Pricing() {
                 e.preventDefault()
                 if (['individual','corporate','institutional','networking'].includes(id)) {
                   sessionStorage.setItem('preselected_ticket', id)
+                  window.dispatchEvent(new CustomEvent('preselect-ticket', { detail: { ticket: id } }))
                 }
                 document.querySelector(ctaHref)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}

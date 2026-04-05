@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import styles from './RegistrationForm.module.css'
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
@@ -9,13 +9,13 @@ type TicketType = '' | 'individual' | 'corporate' | 'institutional' | 'networkin
 interface FormValues {
   ticketType:     TicketType
   /* Step 2 — Qualify */
-  role:           '' | 'ceo' | 'director' | 'policy' | 'cyber' | 'other'
+  role:           string   /* free text */
   orgType:        '' | 'government' | 'finance' | 'telecom' | 'health' | 'education' | 'ngo' | 'private' | 'other'
   orgTypeOther:   string
   region:         '' | 'comesa' | 'sadc' | 'au_other' | 'outside'
   priority:       '' | 'availability' | 'breach' | 'policy' | 'ai' | 'compliance' | 'other'
   priorityOther:  string
-  delegateCount:  string   /* numeric string, corporate / institutional only */
+  delegateCount:  string
   /* Step 3 — Budget */
   budgetStatus:   '' | 'approved' | 'in-progress' | 'not-yet'
   timeframe:      '' | '0-30' | '31-90' | '90+'
@@ -49,7 +49,6 @@ const INITIAL: FormValues = {
 
 /* ─── Lane routing ───────────────────────────────────────────────────────────── */
 type Lane = 'individual' | 'team' | 'partner' | 'networking'
-
 function getLane(t: TicketType): Lane {
   if (t === 'networking')    return 'networking'
   if (t === 'institutional') return 'partner'
@@ -57,34 +56,27 @@ function getLane(t: TicketType): Lane {
   return 'individual'
 }
 
-/* ─── Ticket options ─────────────────────────────────────────────────────────── */
-const TICKETS: { id: TicketType; label: string; sub: string; price: string | null; note: string }[] = [
-  { id: 'individual',    label: 'Main Event · Individual',    sub: '11–14 May 2026 · 4 days',      price: '2,740', note: 'per seat'   },
-  { id: 'corporate',     label: 'Main Event · Corporate',     sub: '2–5 seats · 11–14 May 2026',   price: '2,270', note: 'per seat'   },
-  { id: 'institutional', label: 'Institutional Package',      sub: '6–15 seats · contact us',       price: null,    note: ''          },
-  { id: 'networking',    label: 'Networking Event Only',      sub: '15 May 2026',                   price: '1,175', note: 'per person' },
-]
-
-/* ─── Validation ─────────────────────────────────────────────────────────────── */
-function validateStep1(v: FormValues): Errors {
-  const e: Errors = {}
-  if (!v.ticketType) e.ticketType = 'Please select a ticket type'
-  return e
+/* ─── Ticket config ──────────────────────────────────────────────────────────── */
+const TICKET_CONFIG: Record<string, { name: string; price: string | null; note: string; sub: string }> = {
+  individual:    { name: 'Main Event · Individual',    price: '2,740', note: 'per seat',   sub: '11–14 May 2026 · 4 days' },
+  corporate:     { name: 'Main Event · Corporate',     price: '2,270', note: 'per seat',   sub: '2–5 seats · 11–14 May 2026' },
+  institutional: { name: 'Institutional Package',      price: null,    note: '',           sub: '6–15 seats · contact us' },
+  networking:    { name: 'Networking Event Only',      price: '1,175', note: 'per person', sub: '15 May 2026' },
 }
 
+const TICKETS = Object.entries(TICKET_CONFIG).map(([id, v]) => ({ id: id as TicketType, ...v }))
+
+/* ─── Validation ─────────────────────────────────────────────────────────────── */
 function validateStep2(v: FormValues): Errors {
   const e: Errors = {}
-  if (!v.role)   e.role   = 'Please select your role'
-  if (!v.region) e.region = 'Please select your region'
-
-  /* Networking only needs role + region */
+  if (!v.role.trim()) e.role = 'Please enter your role'
+  if (!v.region)      e.region = 'Please select your region'
   if (v.ticketType !== 'networking') {
     if (!v.orgType) e.orgType = 'Please select your organisation type'
     if (v.orgType === 'other' && !v.orgTypeOther.trim()) e.orgTypeOther = 'Please describe your organisation'
     if (!v.priority) e.priority = 'Please select your main priority'
     if (v.priority === 'other' && !v.priorityOther.trim()) e.priorityOther = 'Please describe your priority'
   }
-
   if (v.ticketType === 'corporate') {
     const n = parseInt(v.delegateCount, 10)
     if (!v.delegateCount || isNaN(n) || n < 2) e.delegateCount = 'Minimum 2 delegates for corporate tickets'
@@ -94,7 +86,6 @@ function validateStep2(v: FormValues): Errors {
     const n = parseInt(v.delegateCount, 10)
     if (!v.delegateCount || isNaN(n) || n < 6) e.delegateCount = 'Minimum 6 delegates for institutional tickets'
   }
-
   return e
 }
 
@@ -201,27 +192,24 @@ function NumberStepper({ value, onChange, min, max, error }: {
   min: number; max: number; error?: string
 }) {
   const n = parseInt(value, 10)
-  const dec = () => { if (!isNaN(n) && n > min) onChange(String(n - 1)) }
-  const inc = () => { if (isNaN(n)) onChange(String(min)); else if (n < max) onChange(String(n + 1)) }
   return (
     <div className={`${styles.stepper} ${error ? styles.stepperError : ''}`}>
-      <button type="button" className={styles.stepperBtn} onClick={dec} aria-label="Decrease" disabled={!isNaN(n) && n <= min}>−</button>
+      <button type="button" className={styles.stepperBtn}
+        onClick={() => { if (!isNaN(n) && n > min) onChange(String(n - 1)) }}
+        aria-label="Decrease" disabled={!isNaN(n) && n <= min}>−</button>
       <input
         className={styles.stepperInput}
-        type="text"
-        inputMode="numeric"
-        value={value}
-        placeholder={String(min)}
-        onChange={e => {
-          const raw = e.target.value.replace(/[^0-9]/g, '')
-          onChange(raw)
-        }}
+        type="text" inputMode="numeric"
+        value={value} placeholder={String(min)}
+        onChange={e => onChange(e.target.value.replace(/[^0-9]/g, ''))}
         onBlur={e => {
           const v = parseInt(e.target.value, 10)
           if (!isNaN(v)) onChange(String(Math.min(max, Math.max(min, v))))
         }}
       />
-      <button type="button" className={styles.stepperBtn} onClick={inc} aria-label="Increase" disabled={!isNaN(n) && n >= max}>+</button>
+      <button type="button" className={styles.stepperBtn}
+        onClick={() => { if (isNaN(n)) onChange(String(min)); else if (n < max) onChange(String(n + 1)) }}
+        aria-label="Increase" disabled={!isNaN(n) && n >= max}>+</button>
     </div>
   )
 }
@@ -275,15 +263,7 @@ function LaneOutcome({ lane, values }: { lane: Lane; values: FormValues }) {
   )
 }
 
-/* ─── Shared option sets ─────────────────────────────────────────────────────── */
-const ROLE_OPTIONS = [
-  { id: 'ceo',      label: 'CEO / Managing Director' },
-  { id: 'director', label: 'Director / Head of Department' },
-  { id: 'policy',   label: 'Policy Maker / Regulator' },
-  { id: 'cyber',    label: 'Cybersecurity / IT Lead' },
-  { id: 'other',    label: 'Other Senior Role' },
-]
-
+/* ─── Org type options ───────────────────────────────────────────────────────── */
 const ORG_TYPE_OPTIONS = [
   { id: 'government', label: 'Government / Agency' },
   { id: 'finance',    label: 'Bank / Financial Services' },
@@ -293,15 +273,6 @@ const ORG_TYPE_OPTIONS = [
   { id: 'ngo',        label: 'NGO / Development' },
   { id: 'private',    label: 'Private Company' },
   { id: 'other',      label: 'Other' },
-]
-
-const PRIORITY_OPTIONS = [
-  { id: 'availability', label: 'Reduce service disruption / downtime' },
-  { id: 'breach',       label: 'Prevent data loss / breach' },
-  { id: 'policy',       label: 'Build cybersecurity policy and controls' },
-  { id: 'ai',           label: 'Govern AI adoption / misinformation risk' },
-  { id: 'compliance',   label: 'Meet regulatory and cross-border compliance' },
-  { id: 'other',        label: 'Other' },
 ]
 
 /* ─── Main component ─────────────────────────────────────────────────────────── */
@@ -314,28 +285,46 @@ export default function RegistrationForm() {
   const [submitting,  setSubmitting]  = useState(false)
   const [submitted,   setSubmitted]   = useState(false)
 
-  const lane = getLane(values.ticketType)
+  /* Refs for stale-closure-safe event handler */
+  const ticketRef = useRef<TicketType>('')
+  const stepRef   = useRef(1)
+  useEffect(() => { ticketRef.current = values.ticketType }, [values.ticketType])
+  useEffect(() => { stepRef.current   = step },              [step])
 
-  /* Read pre-selected ticket from sessionStorage (set by external CTAs) */
+  /* Listen for preselect-ticket events fired by any CTA on the page */
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ticket = (e as CustomEvent<{ ticket: TicketType }>).detail.ticket
+      if (!['individual','corporate','institutional','networking'].includes(ticket)) return
+      const isSame = ticketRef.current === ticket
+      setValues(isSame ? prev => prev : { ...INITIAL, ticketType: ticket })
+      setErrors({})
+      setDirection('fwd')
+      setExitingStep(stepRef.current > 1 ? stepRef.current : null)
+      setStep(2)
+    }
+    window.addEventListener('preselect-ticket', handler)
+    return () => window.removeEventListener('preselect-ticket', handler)
+  }, [])
+
+  /* Also handle sessionStorage on first mount (direct page load with stored ticket) */
   useEffect(() => {
     const stored = sessionStorage.getItem('preselected_ticket') as TicketType | null
     if (stored && ['individual','corporate','institutional','networking'].includes(stored)) {
       sessionStorage.removeItem('preselected_ticket')
-      setValues(prev => {
-        if (prev.ticketType === stored) return prev  /* same ticket — keep answers */
-        return { ...INITIAL, ticketType: stored }    /* different — reset */
-      })
-      setErrors({})
+      setValues({ ...INITIAL, ticketType: stored })
       setStep(2)
     }
   }, [])
+
+  const lane = getLane(values.ticketType)
 
   const set = useCallback(<K extends keyof FormValues>(field: K, value: FormValues[K]) => {
     setValues(prev => ({ ...prev, [field]: value }))
     setErrors(prev => { const n = { ...prev }; delete n[field]; return n })
   }, [])
 
-  /* Ticket card click — auto-advance, reset if switching */
+  /* Ticket card click on step 1 — auto-advance */
   const selectTicket = (id: TicketType) => {
     const isSame = values.ticketType === id
     setValues(isSame ? prev => prev : { ...INITIAL, ticketType: id })
@@ -347,7 +336,6 @@ export default function RegistrationForm() {
 
   const advance = () => {
     const errs =
-      step === 1 ? validateStep1(values) :
       step === 2 ? validateStep2(values) :
       step === 3 ? validateStep3(values) : {}
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
@@ -373,22 +361,22 @@ export default function RegistrationForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ticketType:     values.ticketType,
-          fullName:       values.fullName,
-          jobTitle:       values.jobTitle,
-          organization:   values.organization,
-          country:        values.country,
-          email:          values.email,
-          whatsapp:       values.whatsapp,
-          role:           values.role,
-          orgType:        values.orgType === 'other' ? `Other: ${values.orgTypeOther}` : values.orgType,
-          region:         values.region,
-          priority:       values.priority === 'other' ? `Other: ${values.priorityOther}` : values.priority,
-          delegateCount:  values.delegateCount || (values.ticketType === 'individual' ? '1' : values.ticketType === 'networking' ? '1' : ''),
-          budgetStatus:   values.budgetStatus,
-          timeframe:      values.timeframe,
-          contactPref:    values.contactPref,
-          invoiceNeeded:  values.invoiceNeeded,
+          ticketType:    values.ticketType,
+          fullName:      values.fullName,
+          jobTitle:      values.jobTitle,
+          organization:  values.organization,
+          country:       values.country,
+          email:         values.email,
+          whatsapp:      values.whatsapp,
+          role:          values.role,
+          orgType:       values.orgType === 'other' ? `Other: ${values.orgTypeOther}` : values.orgType,
+          region:        values.region,
+          priority:      values.priority === 'other' ? `Other: ${values.priorityOther}` : values.priority,
+          delegateCount: values.delegateCount || (values.ticketType === 'individual' ? '1' : '1'),
+          budgetStatus:  values.budgetStatus,
+          timeframe:     values.timeframe,
+          contactPref:   values.contactPref,
+          invoiceNeeded: values.invoiceNeeded,
           execAssistName:     values.showExecAssist ? values.execAssistName     : '',
           execAssistWhatsapp: values.showExecAssist ? values.execAssistWhatsapp : '',
           execAssistEmail:    values.showExecAssist ? values.execAssistEmail    : '',
@@ -396,56 +384,36 @@ export default function RegistrationForm() {
       })
 
       if (values.contactPref === 'whatsapp') {
-        const TICKET_LABELS: Record<string, string> = {
-          individual:    'Main Event · Individual (USD 2,740)',
-          corporate:     'Main Event · Corporate (USD 2,270 per seat)',
-          institutional: 'Institutional Package (6–15 seats)',
-          networking:    'Networking Event Only (USD 1,175)',
-        }
-        const ROLE_LABELS: Record<string, string> = {
-          ceo: 'CEO / Managing Director', director: 'Director / Head of Department',
-          policy: 'Policy Maker / Regulator', cyber: 'Cybersecurity / IT Lead', other: 'Other Senior Role',
-        }
-        const ORG_LABELS: Record<string, string> = {
-          government: 'Government / Agency', finance: 'Bank / Financial Services',
-          telecom: 'Telecom / ISP', health: 'Healthcare', education: 'Education',
-          ngo: 'NGO / Development', private: 'Private Company',
-        }
-        const REGION_LABELS: Record<string, string> = {
-          comesa: 'COMESA Member State', sadc: 'SADC Member State',
-          au_other: 'Other AU Member State', outside: 'Outside Africa',
-        }
-        const PRIORITY_LABELS: Record<string, string> = {
-          availability: 'Reduce service disruption / downtime',
-          breach: 'Prevent data loss / breach',
-          policy: 'Build cybersecurity policy and controls',
-          ai: 'Govern AI adoption / misinformation risk',
-          compliance: 'Meet regulatory and cross-border compliance',
-        }
         const BUDGET_LABELS: Record<string, string> = {
           approved: 'Budget approved', 'in-progress': 'Budget approval in progress', 'not-yet': 'Not yet budgeted',
         }
         const TIMEFRAME_LABELS: Record<string, string> = {
           '0-30': 'Ready to register now', '31-90': 'Within the next month', '90+': 'Still exploring options',
         }
+        const ORG_LABELS: Record<string, string> = {
+          government: 'Government / Agency', finance: 'Bank / Financial Services',
+          telecom: 'Telecom / ISP', health: 'Healthcare', education: 'Education',
+          ngo: 'NGO / Development', private: 'Private Company',
+        }
+        const PRIORITY_LABELS: Record<string, string> = {
+          availability: 'Reduce service disruption / downtime', breach: 'Prevent data loss / breach',
+          policy: 'Build cybersecurity policy and controls', ai: 'Govern AI adoption / misinformation risk',
+          compliance: 'Meet regulatory and cross-border compliance',
+        }
+        const REGION_LABELS: Record<string, string> = {
+          comesa: 'COMESA Member State', sadc: 'SADC Member State',
+          au_other: 'Other AU Member State', outside: 'Outside Africa',
+        }
+        const tc = TICKET_CONFIG[values.ticketType]
+        const ticketLabel = tc ? `${tc.name}${tc.price ? ` (USD ${tc.price} ${tc.note})` : ''}` : values.ticketType
 
-        const orgTypeDisplay = values.orgType === 'other'
-          ? `Other — ${values.orgTypeOther}`
-          : (ORG_LABELS[values.orgType] || values.orgType)
-
-        const priorityDisplay = values.priority === 'other'
-          ? `Other — ${values.priorityOther}`
-          : (PRIORITY_LABELS[values.priority] || values.priority)
-
-        const delegatesLine =
-          values.ticketType === 'individual' ? '1 seat' :
-          values.ticketType === 'networking' ? 'Networking only (1 person)' :
-          `${values.delegateCount} delegates`
+        const orgTypeDisplay = values.orgType === 'other' ? `Other — ${values.orgTypeOther}` : (ORG_LABELS[values.orgType] || values.orgType)
+        const priorityDisplay = values.priority === 'other' ? `Other — ${values.priorityOther}` : (PRIORITY_LABELS[values.priority] || values.priority)
+        const delegatesLine = values.ticketType === 'individual' ? '1 seat' : values.ticketType === 'networking' ? '1 person' : `${values.delegateCount} delegates`
 
         const lines = [
           `New registration — SICC AI Cape Town Summit`,
-          ``,
-          `Ticket: ${TICKET_LABELS[values.ticketType] || values.ticketType}`,
+          `Ticket: ${ticketLabel}`,
           `Delegates: ${delegatesLine}`,
           ``,
           `Name: ${values.fullName}`,
@@ -455,7 +423,7 @@ export default function RegistrationForm() {
           `Email: ${values.email}`,
           `WhatsApp: ${values.whatsapp}`,
           ``,
-          `Role: ${ROLE_LABELS[values.role] || values.role}`,
+          `Role: ${values.role}`,
           values.ticketType !== 'networking' ? `Organisation Type: ${orgTypeDisplay}` : '',
           `Region: ${REGION_LABELS[values.region] || values.region}`,
           values.ticketType !== 'networking' ? `Main Priority: ${priorityDisplay}` : '',
@@ -483,7 +451,7 @@ export default function RegistrationForm() {
     }
   }
 
-  /* ── Success state ── */
+  /* ── Success ── */
   if (submitted) {
     return (
       <section id="register" className={styles.section} aria-label="Registration confirmed">
@@ -504,17 +472,12 @@ export default function RegistrationForm() {
   }
 
   const STEP_LABELS = ['Ticket', 'About You', 'Budget', 'Contact']
+  const tc = values.ticketType ? TICKET_CONFIG[values.ticketType] : null
 
   const step2Title =
     values.ticketType === 'corporate'     ? 'About Your Organisation' :
     values.ticketType === 'institutional' ? 'About Your Institution'  :
     values.ticketType === 'networking'    ? 'A Few Quick Details'     : 'Tell us about yourself'
-
-  const laneIndicatorLabel =
-    values.ticketType === 'individual'    ? 'Main Event · Individual — USD 2,740' :
-    values.ticketType === 'corporate'     ? 'Main Event · Corporate — USD 2,270 per seat' :
-    values.ticketType === 'institutional' ? 'Institutional Package — contact us for pricing' :
-                                            'Networking Event Only — USD 1,175'
 
   return (
     <section id="register" className={styles.section} aria-labelledby="form-heading">
@@ -527,10 +490,29 @@ export default function RegistrationForm() {
 
         <div className={styles.formWrap}>
 
-          {step >= 2 && values.ticketType && (
-            <div className={styles.laneIndicator} aria-live="polite">
-              <span className={styles.laneDot} aria-hidden="true" />
-              <span className={styles.laneLabel}>{laneIndicatorLabel}</span>
+          {/* ── Ticket banner — shown when on step 2+ ── */}
+          {step >= 2 && tc && (
+            <div className={styles.ticketBanner}>
+              <div className={styles.ticketBannerLeft}>
+                <p className={styles.ticketBannerName}>{tc.name}</p>
+                {tc.price
+                  ? <p className={styles.ticketBannerPrice}><span className={styles.ticketBannerCurrency}>USD </span>{tc.price}<span className={styles.ticketBannerNote}> {tc.note}</span></p>
+                  : <p className={styles.ticketBannerPriceContact}>Contact Us for Pricing</p>
+                }
+                <p className={styles.ticketBannerSub}>{tc.sub}</p>
+              </div>
+              <button
+                type="button"
+                className={styles.ticketBannerChange}
+                onClick={() => {
+                  setErrors({})
+                  setDirection('bwd')
+                  setExitingStep(step)
+                  setStep(1)
+                }}
+              >
+                ← Change ticket
+              </button>
             </div>
           )}
 
@@ -559,8 +541,7 @@ export default function RegistrationForm() {
             {exitingStep !== null && (
               <div className={styles.stepExiting} data-dir={direction} onAnimationEnd={() => setExitingStep(null)} aria-hidden="true" />
             )}
-
-            <div className={styles.stepActive} data-dir={direction} key={step}>
+            <div className={styles.stepActive} data-dir={direction} key={`${step}-${values.ticketType}`}>
 
               {/* ── Step 1: Ticket ── */}
               {step === 1 && (
@@ -575,17 +556,12 @@ export default function RegistrationForm() {
                         onClick={() => selectTicket(t.id)}
                         aria-pressed={values.ticketType === t.id}
                       >
-                        <span className={styles.ticketLabel}>{t.label}</span>
+                        <span className={styles.ticketLabel}>{t.name}</span>
                         <span className={styles.ticketSub}>{t.sub}</span>
-                        {t.price ? (
-                          <span className={styles.ticketPrice}>
-                            <span className={styles.ticketCurrency}>USD </span>
-                            {t.price}
-                            <span className={styles.ticketNote}> {t.note}</span>
-                          </span>
-                        ) : (
-                          <span className={styles.ticketPriceContact}>Contact Us</span>
-                        )}
+                        {t.price
+                          ? <span className={styles.ticketPrice}><span className={styles.ticketCurrency}>USD </span>{t.price}<span className={styles.ticketNote}> {t.note}</span></span>
+                          : <span className={styles.ticketPriceContact}>Contact Us</span>
+                        }
                       </button>
                     ))}
                   </div>
@@ -593,18 +569,19 @@ export default function RegistrationForm() {
                 </>
               )}
 
-              {/* ── Step 2: Qualify (ticket-specific) ── */}
+              {/* ── Step 2: Qualify ── */}
               {step === 2 && (
                 <>
                   <p className={styles.stepTitle}>{step2Title}</p>
 
-                  <RadioCards
-                    label="Your role" required
-                    options={ROLE_OPTIONS}
-                    value={values.role}
-                    onChange={v => set('role', v as FormValues['role'])}
-                    error={errors.role}
-                  />
+                  <Field label="Your role / title" required error={errors.role}>
+                    <input
+                      className={`${styles.input} ${errors.role ? styles.inputError : ''}`}
+                      value={values.role}
+                      onChange={e => set('role', e.target.value)}
+                      placeholder="e.g. Chief Executive Officer, Director General…"
+                    />
+                  </Field>
 
                   {values.ticketType !== 'networking' && (
                     <>
@@ -642,13 +619,19 @@ export default function RegistrationForm() {
 
                   {values.ticketType !== 'networking' && (
                     <>
-                      <RadioCards
+                      <SelectField
                         label="Main priority right now" required
-                        options={PRIORITY_OPTIONS}
-                        value={values.priority}
-                        onChange={v => set('priority', v as FormValues['priority'])}
+                        value={values.priority} onChange={v => set('priority', v as FormValues['priority'])}
+                        placeholder="Select your main priority…"
                         error={errors.priority}
-                      />
+                      >
+                        <option value="availability">Reduce service disruption / downtime</option>
+                        <option value="breach">Prevent data loss / breach</option>
+                        <option value="policy">Build cybersecurity policy and controls</option>
+                        <option value="ai">Govern AI adoption / misinformation risk</option>
+                        <option value="compliance">Meet regulatory and cross-border compliance</option>
+                        <option value="other">Other</option>
+                      </SelectField>
                       {values.priority === 'other' && (
                         <Field label="Please describe your main priority" required error={errors.priorityOther}>
                           <input
@@ -667,8 +650,7 @@ export default function RegistrationForm() {
                       label={values.ticketType === 'corporate'
                         ? 'How many delegates will your organisation be sending?'
                         : 'How many seats does your institution require?'}
-                      required
-                      error={errors.delegateCount}
+                      required error={errors.delegateCount}
                     >
                       <NumberStepper
                         value={values.delegateCount}
@@ -692,34 +674,25 @@ export default function RegistrationForm() {
                 <>
                   <p className={styles.stepTitle}>Budget &amp; Contact Preference</p>
 
-                  <SelectField
-                    label="Training budget status" required
+                  <SelectField label="Training budget status" required
                     value={values.budgetStatus} onChange={v => set('budgetStatus', v as FormValues['budgetStatus'])}
-                    placeholder="Select budget status…"
-                    error={errors.budgetStatus}
-                  >
+                    placeholder="Select budget status…" error={errors.budgetStatus}>
                     <option value="approved">Budget approved</option>
                     <option value="in-progress">In progress / pending approval</option>
                     <option value="not-yet">Not yet allocated</option>
                   </SelectField>
 
-                  <SelectField
-                    label="When are you planning to register?" required
+                  <SelectField label="When are you planning to register?" required
                     value={values.timeframe} onChange={v => set('timeframe', v as FormValues['timeframe'])}
-                    placeholder="Select timeframe…"
-                    error={errors.timeframe}
-                  >
+                    placeholder="Select timeframe…" error={errors.timeframe}>
                     <option value="0-30">Ready to register now</option>
                     <option value="31-90">Within the next month</option>
                     <option value="90+">Still exploring options</option>
                   </SelectField>
 
-                  <SelectField
-                    label="Preferred contact method" required
+                  <SelectField label="Preferred contact method" required
                     value={values.contactPref} onChange={v => set('contactPref', v as FormValues['contactPref'])}
-                    placeholder="Select contact method…"
-                    error={errors.contactPref}
-                  >
+                    placeholder="Select contact method…" error={errors.contactPref}>
                     <option value="whatsapp">WhatsApp (fastest)</option>
                     <option value="email">Email</option>
                     <option value="assistant">Via my Executive Assistant</option>
@@ -728,12 +701,9 @@ export default function RegistrationForm() {
                   {values.ticketType !== 'networking' && (
                     <div className={styles.fieldGroup}>
                       <label className={styles.checkboxRow}>
-                        <input
-                          type="checkbox"
-                          className={styles.checkboxInput}
+                        <input type="checkbox" className={styles.checkboxInput}
                           checked={values.invoiceNeeded}
-                          onChange={e => set('invoiceNeeded', e.target.checked)}
-                        />
+                          onChange={e => set('invoiceNeeded', e.target.checked)} />
                         <span className={styles.checkboxCustom} />
                         <span className={styles.checkboxLabel}>I need a formal invoice for procurement / budget approval</span>
                       </label>
@@ -788,7 +758,6 @@ export default function RegistrationForm() {
                       autoComplete="tel" placeholder="+254 712 345 678" />
                   </Field>
 
-                  {/* Executive assistant */}
                   <div className={styles.fieldGroup}>
                     <label className={styles.checkboxRow}>
                       <input type="checkbox" className={styles.checkboxInput}
@@ -817,21 +786,15 @@ export default function RegistrationForm() {
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    className={styles.submitBtn}
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                    aria-busy={submitting}
-                  >
-                    {submitting ? (
-                      <><span className={styles.spinner} aria-hidden="true" /><span>Submitting…</span></>
-                    ) : (
-                      lane === 'individual' ? 'Reserve My Seat' :
-                      lane === 'networking' ? 'Reserve Networking Place' :
-                      lane === 'team'       ? 'Book Team Seats' :
-                                             'Submit Institutional Inquiry'
-                    )}
+                  <button type="button" className={styles.submitBtn} onClick={handleSubmit}
+                    disabled={submitting} aria-busy={submitting}>
+                    {submitting
+                      ? <><span className={styles.spinner} aria-hidden="true" /><span>Submitting…</span></>
+                      : lane === 'individual' ? 'Reserve My Seat'
+                      : lane === 'networking' ? 'Reserve Networking Place'
+                      : lane === 'team'       ? 'Book Team Seats'
+                      :                         'Submit Institutional Inquiry'
+                    }
                   </button>
 
                   <div className={styles.stepFooter} style={{ marginTop: 'var(--space-sm)' }}>
