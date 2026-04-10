@@ -9,7 +9,6 @@ type TicketType = '' | 'individual' | 'corporate' | 'institutional' | 'networkin
 interface FormValues {
   ticketType:     TicketType
   /* Step 2 — Qualify */
-  role:           string   /* free text */
   orgType:        '' | 'government' | 'finance' | 'telecom' | 'health' | 'education' | 'ngo' | 'private' | 'other'
   orgTypeOther:   string
   region:         '' | 'comesa' | 'sadc' | 'au_other' | 'outside'
@@ -38,7 +37,7 @@ type Errors = Partial<Record<keyof FormValues, string>>
 
 const INITIAL: FormValues = {
   ticketType: '',
-  role: '', orgType: '', orgTypeOther: '', region: '',
+  orgType: '', orgTypeOther: '', region: '',
   priority: '', priorityOther: '', delegateCount: '',
   budgetStatus: '', timeframe: '', contactPref: '', invoiceNeeded: false,
   fullName: '', jobTitle: '', organization: '', country: '',
@@ -69,8 +68,7 @@ const TICKETS = Object.entries(TICKET_CONFIG).map(([id, v]) => ({ id: id as Tick
 /* ─── Validation ─────────────────────────────────────────────────────────────── */
 function validateStep2(v: FormValues): Errors {
   const e: Errors = {}
-  if (!v.role.trim()) e.role = 'Please enter your role'
-  if (!v.region)      e.region = 'Please select your region'
+  if (!v.region) e.region = 'Please select your region'
   if (v.ticketType !== 'networking') {
     if (!v.orgType) e.orgType = 'Please select your organisation type'
     if (v.orgType === 'other' && !v.orgTypeOther.trim()) e.orgTypeOther = 'Please describe your organisation'
@@ -263,6 +261,45 @@ function LaneOutcome({ lane, values }: { lane: Lane; values: FormValues }) {
   )
 }
 
+/* ─── Label maps (used in webhook payload + WhatsApp message) ────────────────── */
+const BUDGET_LABELS: Record<string, string> = {
+  approved:     'Budget approved',
+  'in-progress':'Budget approval in progress',
+  'not-yet':    'Not yet budgeted',
+}
+const TIMEFRAME_LABELS: Record<string, string> = {
+  '0-30': 'Ready to register now',
+  '31-90':'Within the next month',
+  '90+':  'Still exploring options',
+}
+const CONTACT_LABELS: Record<string, string> = {
+  whatsapp:  'WhatsApp',
+  email:     'Email',
+  assistant: 'Via Executive Assistant',
+}
+const ORG_LABELS: Record<string, string> = {
+  government: 'Government / Agency',
+  finance:    'Bank / Financial Services',
+  telecom:    'Telecom / ISP',
+  health:     'Healthcare',
+  education:  'Education',
+  ngo:        'NGO / Development',
+  private:    'Private Company',
+}
+const PRIORITY_LABELS: Record<string, string> = {
+  availability: 'Reduce service disruption / downtime',
+  breach:       'Prevent data loss / breach',
+  policy:       'Build cybersecurity policy and controls',
+  ai:           'Govern AI adoption / misinformation risk',
+  compliance:   'Meet regulatory and cross-border compliance',
+}
+const REGION_LABELS: Record<string, string> = {
+  comesa:   'COMESA Member State',
+  sadc:     'SADC Member State',
+  au_other: 'Other AU Member State',
+  outside:  'Outside Africa',
+}
+
 /* ─── Org type options ───────────────────────────────────────────────────────── */
 const ORG_TYPE_OPTIONS = [
   { id: 'government', label: 'Government / Agency' },
@@ -357,26 +394,33 @@ export default function RegistrationForm() {
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setSubmitting(true)
     try {
+      const tc = TICKET_CONFIG[values.ticketType]
+      const delegateCount =
+        values.ticketType === 'individual' ? '1' :
+        values.ticketType === 'networking' ? '1' :
+        values.delegateCount || (values.ticketType === 'corporate' ? '2' : '6')
+      const orgTypeLabel     = values.orgType === 'other'     ? `Other: ${values.orgTypeOther}`     : (ORG_LABELS[values.orgType]         || values.orgType)
+      const priorityLabel    = values.priority === 'other'    ? `Other: ${values.priorityOther}`    : (PRIORITY_LABELS[values.priority]    || values.priority)
+
       await fetch('https://hook.eu2.make.com/9ui6srn3z482gs9k1wsnu3abdggtcpjp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ticketType:    values.ticketType,
+          ticketType:    tc?.name || values.ticketType,
           fullName:      values.fullName,
           jobTitle:      values.jobTitle,
           organization:  values.organization,
           country:       values.country,
           email:         values.email,
           whatsapp:      values.whatsapp,
-          role:          values.role,
-          orgType:       values.orgType === 'other' ? `Other: ${values.orgTypeOther}` : values.orgType,
-          region:        values.region,
-          priority:      values.priority === 'other' ? `Other: ${values.priorityOther}` : values.priority,
-          delegateCount: values.delegateCount || (values.ticketType === 'individual' ? '1' : '1'),
-          budgetStatus:  values.budgetStatus,
-          timeframe:     values.timeframe,
-          contactPref:   values.contactPref,
-          invoiceNeeded: values.invoiceNeeded,
+          orgType:       orgTypeLabel,
+          region:        REGION_LABELS[values.region]   || values.region,
+          priority:      priorityLabel,
+          delegateCount,
+          budgetStatus:  BUDGET_LABELS[values.budgetStatus]  || values.budgetStatus,
+          timeframe:     TIMEFRAME_LABELS[values.timeframe]  || values.timeframe,
+          contactPref:   CONTACT_LABELS[values.contactPref]  || values.contactPref,
+          invoiceNeeded: values.invoiceNeeded ? 'Yes' : 'No',
           execAssistName:     values.showExecAssist ? values.execAssistName     : '',
           execAssistWhatsapp: values.showExecAssist ? values.execAssistWhatsapp : '',
           execAssistEmail:    values.showExecAssist ? values.execAssistEmail    : '',
@@ -384,32 +428,9 @@ export default function RegistrationForm() {
       })
 
       if (values.contactPref === 'whatsapp') {
-        const BUDGET_LABELS: Record<string, string> = {
-          approved: 'Budget approved', 'in-progress': 'Budget approval in progress', 'not-yet': 'Not yet budgeted',
-        }
-        const TIMEFRAME_LABELS: Record<string, string> = {
-          '0-30': 'Ready to register now', '31-90': 'Within the next month', '90+': 'Still exploring options',
-        }
-        const ORG_LABELS: Record<string, string> = {
-          government: 'Government / Agency', finance: 'Bank / Financial Services',
-          telecom: 'Telecom / ISP', health: 'Healthcare', education: 'Education',
-          ngo: 'NGO / Development', private: 'Private Company',
-        }
-        const PRIORITY_LABELS: Record<string, string> = {
-          availability: 'Reduce service disruption / downtime', breach: 'Prevent data loss / breach',
-          policy: 'Build cybersecurity policy and controls', ai: 'Govern AI adoption / misinformation risk',
-          compliance: 'Meet regulatory and cross-border compliance',
-        }
-        const REGION_LABELS: Record<string, string> = {
-          comesa: 'COMESA Member State', sadc: 'SADC Member State',
-          au_other: 'Other AU Member State', outside: 'Outside Africa',
-        }
-        const tc = TICKET_CONFIG[values.ticketType]
         const ticketLabel = tc ? `${tc.name}${tc.price ? ` (USD ${tc.price} ${tc.note})` : ''}` : values.ticketType
 
-        const orgTypeDisplay = values.orgType === 'other' ? `Other — ${values.orgTypeOther}` : (ORG_LABELS[values.orgType] || values.orgType)
-        const priorityDisplay = values.priority === 'other' ? `Other — ${values.priorityOther}` : (PRIORITY_LABELS[values.priority] || values.priority)
-        const delegatesLine = values.ticketType === 'individual' ? '1 seat' : values.ticketType === 'networking' ? '1 person' : `${values.delegateCount} delegates`
+        const delegatesLine = values.ticketType === 'individual' ? '1 seat' : values.ticketType === 'networking' ? '1 person' : `${delegateCount} delegates`
 
         const lines = [
           `New registration — SICC AI Cape Town Summit`,
@@ -423,10 +444,9 @@ export default function RegistrationForm() {
           `Email: ${values.email}`,
           `WhatsApp: ${values.whatsapp}`,
           ``,
-          `Role: ${values.role}`,
-          values.ticketType !== 'networking' ? `Organisation Type: ${orgTypeDisplay}` : '',
+          values.ticketType !== 'networking' ? `Organisation Type: ${orgTypeLabel}` : '',
           `Region: ${REGION_LABELS[values.region] || values.region}`,
-          values.ticketType !== 'networking' ? `Main Priority: ${priorityDisplay}` : '',
+          values.ticketType !== 'networking' ? `Main Priority: ${priorityLabel}` : '',
           ``,
           `Budget Status: ${BUDGET_LABELS[values.budgetStatus] || values.budgetStatus}`,
           `Registration Timeline: ${TIMEFRAME_LABELS[values.timeframe] || values.timeframe}`,
@@ -573,15 +593,6 @@ export default function RegistrationForm() {
               {step === 2 && (
                 <>
                   <p className={styles.stepTitle}>{step2Title}</p>
-
-                  <Field label="Your role / title" required error={errors.role}>
-                    <input
-                      className={`${styles.input} ${errors.role ? styles.inputError : ''}`}
-                      value={values.role}
-                      onChange={e => set('role', e.target.value)}
-                      placeholder="e.g. Chief Executive Officer, Director General…"
-                    />
-                  </Field>
 
                   {values.ticketType !== 'networking' && (
                     <>
