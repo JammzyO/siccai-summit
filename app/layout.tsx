@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Outfit } from 'next/font/google'
+import Script from 'next/script'
 import Nav from '@/app/components/Nav/Nav'
 import Footer from '@/app/components/Footer/Footer'
 import ScrollReveal from '@/app/components/ScrollReveal/ScrollReveal'
@@ -60,6 +61,17 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${outfit.variable}`}
     >
+      {/* ── Google Ads Tag (AW-17322819400) ── */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=AW-17322819400"
+        strategy="afterInteractive"
+      />
+      <Script id="google-ads-tag" strategy="afterInteractive">{`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-17322819400');
+      `}</Script>
       <body>
         {/* Global noise grain overlay — fixed, pointer-events: none, z-index: 1000 */}
         <div className="noise-overlay" aria-hidden="true" />
