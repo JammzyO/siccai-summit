@@ -432,6 +432,11 @@ export default function RegistrationForm() {
         }),
       })
 
+      // Fire Google Ads conversion on successful form submission
+      if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+        ;(window as any).gtag('event', 'conversion', { send_to: 'AW-17322819400/fltpCILappscEMj-lMRA' })
+      }
+
       if (values.contactPref === 'whatsapp') {
         const ticketLabel = tc ? `${tc.name}${tc.price ? ` (USD ${tc.price} ${tc.note})` : ''}` : values.ticketType
 
