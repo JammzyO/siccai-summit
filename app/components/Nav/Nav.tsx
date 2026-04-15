@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import styles from './Nav.module.css'
 
 /* ─── Nav links ──────────────────────────────────────────────────────────────── */
 const NAV_LINKS = [
+  { label: 'Home',        href: 'https://www.siccai.org' },
   { label: 'Overview',    href: '#overview'     },
   { label: 'Programme',   href: '#programme'    },
   { label: 'Why Attend',  href: '#credibility'  },
@@ -155,7 +155,7 @@ export default function Nav() {
 
           {/* Logo */}
           <div className={styles.logoWrap}>
-            <Link href="/" aria-label="SICC AI — home" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <a href="https://www.siccai.org" target="_blank" rel="noopener noreferrer" aria-label="SICC AI — visit main website">
               <Image
                 src="/logo.png"
                 alt="SICC AI"
@@ -164,20 +164,23 @@ export default function Nav() {
                 style={{ height: '40px', width: 'auto' }}
                 priority
               />
-            </Link>
+            </a>
           </div>
 
           {/* Desktop links */}
           <ul className={styles.links} role="list">
             {NAV_LINKS.map(({ label, href }) => {
-              const sectionId = href.slice(1)
-              const isActive = activeSection === sectionId
+              const isAnchor = href.startsWith('#')
+              const sectionId = isAnchor ? href.slice(1) : ''
+              const isActive = isAnchor && activeSection === sectionId
               return (
                 <li key={href}>
                   <a
                     href={href}
                     className={`${styles.link} ${isActive ? styles.linkActive : ''}`}
-                    onClick={e => { e.preventDefault(); scrollTo(href) }}
+                    onClick={isAnchor ? (e => { e.preventDefault(); scrollTo(href) }) : undefined}
+                    target={isAnchor ? undefined : '_blank'}
+                    rel={isAnchor ? undefined : 'noopener noreferrer'}
                     aria-current={isActive ? 'location' : undefined}
                   >
                     {label}
@@ -227,14 +230,17 @@ export default function Nav() {
       >
         <ul className={styles.mobileLinks} role="list">
           {NAV_LINKS.map(({ label, href }) => {
-            const sectionId = href.slice(1)
-            const isActive = activeSection === sectionId
+            const isAnchor = href.startsWith('#')
+            const sectionId = isAnchor ? href.slice(1) : ''
+            const isActive = isAnchor && activeSection === sectionId
             return (
               <li key={href}>
                 <a
                   href={href}
                   className={`${styles.mobileLink} ${isActive ? styles.mobileLinkActive : ''}`}
-                  onClick={e => { e.preventDefault(); scrollTo(href, close) }}
+                  onClick={isAnchor ? (e => { e.preventDefault(); scrollTo(href, close) }) : close}
+                  target={isAnchor ? undefined : '_blank'}
+                  rel={isAnchor ? undefined : 'noopener noreferrer'}
                   aria-current={isActive ? 'location' : undefined}
                 >
                   {label}
