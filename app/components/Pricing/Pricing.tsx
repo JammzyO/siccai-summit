@@ -8,7 +8,7 @@ const TIERS = [
   {
     id:        'networking',
     label:     'Networking Event',
-    seats:     '15 June 2026',
+    seats:     '26 June 2026',
     price:     '1,175',
     priceNote: 'per person · networking only',
     featured:  false,
@@ -18,7 +18,7 @@ const TIERS = [
     ctaHref:   '#register',
     delay:     0,
     inclusions: [
-      'Access to networking event — 15 June 2026',
+      'Access to networking event — 26 June 2026',
       'Cross-sector partnership forum',
       'Pan-African delegate mixer',
     ],
@@ -27,7 +27,7 @@ const TIERS = [
   {
     id:        'individual',
     label:     'Main Event · Individual',
-    seats:     '11–14 June 2026',
+    seats:     '22–25 June 2026',
     price:     '2,740',
     priceNote: 'per seat · individual rate',
     featured:  true,
@@ -37,7 +37,7 @@ const TIERS = [
     ctaHref:   '#register',
     delay:     100,
     inclusions: [
-      '4 days of executive-level training (11–14 June)',
+      '4 days of executive-level training (22–25 June)',
       'Executive workbook + governance templates',
       'Certificate of completion',
       'Institutional approval letter',
@@ -48,7 +48,7 @@ const TIERS = [
   {
     id:        'corporate',
     label:     'Main Event · Corporate',
-    seats:     '2–5 seats · 11–14 June 2026',
+    seats:     '2–5 seats · 22–25 June 2026',
     price:     '2,270',
     priceNote: 'per seat · corporate rate',
     featured:  false,
@@ -99,7 +99,7 @@ const TIERS = [
     ctaHref:   '#register',
     delay:     350,
     inclusions: [
-      'Live-streamed plenary sessions (11–14 June)',
+      'Live-streamed plenary sessions (22–25 June)',
       'Access to recorded sessions post-summit',
       'Digital executive workbook',
       'Virtual networking forum access',

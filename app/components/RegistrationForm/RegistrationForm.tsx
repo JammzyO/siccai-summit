@@ -58,10 +58,10 @@ function getLane(t: TicketType): Lane {
 
 /* ─── Ticket config ──────────────────────────────────────────────────────────── */
 const TICKET_CONFIG: Record<string, { name: string; price: string | null; note: string; sub: string }> = {
-  individual:    { name: 'Main Event · Individual',    price: '2,740', note: 'per seat',   sub: '11–14 June 2026 · 4 days' },
-  corporate:     { name: 'Main Event · Corporate',     price: '2,270', note: 'per seat',   sub: '2–5 seats · 11–14 June 2026' },
+  individual:    { name: 'Main Event · Individual',    price: '2,740', note: 'per seat',   sub: '22–25 June 2026 · 4 plenary days' },
+  corporate:     { name: 'Main Event · Corporate',     price: '2,270', note: 'per seat',   sub: '2–5 seats · 22–25 June 2026' },
   institutional: { name: 'Institutional Package',      price: null,    note: '',           sub: '6–15 seats · contact us' },
-  networking:    { name: 'Networking Event Only',      price: '1,175', note: 'per person', sub: '15 June 2026' },
+  networking:    { name: 'Networking Event Only',      price: '1,175', note: 'per person', sub: '26 June 2026' },
   virtual:       { name: 'Virtual Attendance',         price: null,    note: '',           sub: 'Online · All 4 Plenary Days' },
 }
 
@@ -236,7 +236,7 @@ function LaneOutcome({ lane, values }: { lane: Lane; values: FormValues }) {
   if (lane === 'networking') return (
     <div className={styles.laneOutcome}>
       <p className={styles.laneOutcomeTitle}>Your next step</p>
-      <p className={styles.laneOutcomeBody}>Our team will contact you within 24 hours with payment details and logistics for the Networking Event on 15 June 2026.</p>
+      <p className={styles.laneOutcomeBody}>Our team will contact you within 24 hours with payment details and logistics for the Networking Event on 26 June 2026.</p>
     </div>
   )
   if (lane === 'virtual') return (

@@ -8,7 +8,7 @@ const SPEAKERS = [
   {
     id: 'francis',
     day: 'Day 1',
-    dayLabel: 'June 11',
+    dayLabel: 'June 22',
     slot: 'Opening Keynote',
     theme: 'Cyber Security',
     name: 'Francis',
@@ -20,7 +20,7 @@ const SPEAKERS = [
   {
     id: 'muganda',
     day: 'Day 1',
-    dayLabel: 'June 11',
+    dayLabel: 'June 22',
     slot: 'Mid-Morning Keynote',
     theme: 'Cyber Security',
     name: 'Joseph Muganda',
@@ -32,7 +32,7 @@ const SPEAKERS = [
   {
     id: 'odinga',
     day: 'Day 2',
-    dayLabel: 'June 12',
+    dayLabel: 'June 23',
     slot: 'Policy Keynote',
     theme: 'Policy & Leadership',
     name: 'Hon. Jaoko Oburu Odinga',
@@ -48,7 +48,7 @@ At the Cybersecurity & AI Conference in Cape Town, Hon. Odinga brings a forward-
   {
     id: 'harandi',
     day: 'Day 3',
-    dayLabel: 'June 13',
+    dayLabel: 'June 24',
     slot: 'AI Keynote',
     theme: 'Artificial Intelligence',
     name: 'Dr. Amir Harandi',

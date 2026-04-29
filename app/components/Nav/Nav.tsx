@@ -14,7 +14,7 @@ const NAV_LINKS = [
 ]
 
 /* ─── Countdown ──────────────────────────────────────────────────────────────── */
-const SUMMIT_DATE = new Date('2026-06-11T09:00:00+02:00')
+const SUMMIT_DATE = new Date('2026-06-22T09:00:00+02:00')
 
 function getTimeLeft() {
   const diff = SUMMIT_DATE.getTime() - Date.now()
