@@ -6,7 +6,7 @@ const INCLUSIONS = [
   {
     num: '01',
     title: 'Summit Training Seat',
-    desc: '5 days of executive-level instruction at The Bay Hotel, Cape Town — 11–15 May 2026. Plenary sessions, facilitated workshops, and peer exchange with senior leaders across Africa.',
+    desc: '5 days of executive-level instruction at the Cape Town International Convention Centre (CTICC) — 11–15 June 2026. Plenary sessions, facilitated workshops, and peer exchange with senior leaders across Africa.',
   },
   {
     num: '02',

@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import styles from './RegistrationForm.module.css'
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
-type TicketType = '' | 'individual' | 'corporate' | 'institutional' | 'networking'
+type TicketType = '' | 'individual' | 'corporate' | 'institutional' | 'networking' | 'virtual'
 
 interface FormValues {
   ticketType:     TicketType
@@ -47,9 +47,10 @@ const INITIAL: FormValues = {
 }
 
 /* ─── Lane routing ───────────────────────────────────────────────────────────── */
-type Lane = 'individual' | 'team' | 'partner' | 'networking'
+type Lane = 'individual' | 'team' | 'partner' | 'networking' | 'virtual'
 function getLane(t: TicketType): Lane {
   if (t === 'networking')    return 'networking'
+  if (t === 'virtual')       return 'virtual'
   if (t === 'institutional') return 'partner'
   if (t === 'corporate')     return 'team'
   return 'individual'
@@ -57,10 +58,11 @@ function getLane(t: TicketType): Lane {
 
 /* ─── Ticket config ──────────────────────────────────────────────────────────── */
 const TICKET_CONFIG: Record<string, { name: string; price: string | null; note: string; sub: string }> = {
-  individual:    { name: 'Main Event · Individual',    price: '2,740', note: 'per seat',   sub: '11–14 May 2026 · 4 days' },
-  corporate:     { name: 'Main Event · Corporate',     price: '2,270', note: 'per seat',   sub: '2–5 seats · 11–14 May 2026' },
+  individual:    { name: 'Main Event · Individual',    price: '2,740', note: 'per seat',   sub: '11–14 June 2026 · 4 days' },
+  corporate:     { name: 'Main Event · Corporate',     price: '2,270', note: 'per seat',   sub: '2–5 seats · 11–14 June 2026' },
   institutional: { name: 'Institutional Package',      price: null,    note: '',           sub: '6–15 seats · contact us' },
-  networking:    { name: 'Networking Event Only',      price: '1,175', note: 'per person', sub: '15 May 2026' },
+  networking:    { name: 'Networking Event Only',      price: '1,175', note: 'per person', sub: '15 June 2026' },
+  virtual:       { name: 'Virtual Attendance',         price: null,    note: '',           sub: 'Online · All 4 Plenary Days' },
 }
 
 const TICKETS = Object.entries(TICKET_CONFIG).map(([id, v]) => ({ id: id as TicketType, ...v }))
@@ -69,7 +71,7 @@ const TICKETS = Object.entries(TICKET_CONFIG).map(([id, v]) => ({ id: id as Tick
 function validateStep2(v: FormValues): Errors {
   const e: Errors = {}
   if (!v.region) e.region = 'Please select your region'
-  if (v.ticketType !== 'networking') {
+  if (v.ticketType !== 'networking' && v.ticketType !== 'virtual') {
     if (!v.orgType) e.orgType = 'Please select your organisation type'
     if (v.orgType === 'other' && !v.orgTypeOther.trim()) e.orgTypeOther = 'Please describe your organisation'
     if (!v.priority) e.priority = 'Please select your main priority'
@@ -234,7 +236,13 @@ function LaneOutcome({ lane, values }: { lane: Lane; values: FormValues }) {
   if (lane === 'networking') return (
     <div className={styles.laneOutcome}>
       <p className={styles.laneOutcomeTitle}>Your next step</p>
-      <p className={styles.laneOutcomeBody}>Our team will contact you within 24 hours with payment details and logistics for the Networking Event on 15 May 2026.</p>
+      <p className={styles.laneOutcomeBody}>Our team will contact you within 24 hours with payment details and logistics for the Networking Event on 15 June 2026.</p>
+    </div>
+  )
+  if (lane === 'virtual') return (
+    <div className={styles.laneOutcome}>
+      <p className={styles.laneOutcomeTitle}>Virtual Access — Next Steps</p>
+      <p className={styles.laneOutcomeBody}>Our team will contact you within 24 hours with virtual access pricing, platform details, and payment information so you can join from anywhere in the world.</p>
     </div>
   )
   if (lane === 'individual') return (
@@ -332,7 +340,7 @@ export default function RegistrationForm() {
   useEffect(() => {
     const handler = (e: Event) => {
       const ticket = (e as CustomEvent<{ ticket: TicketType }>).detail.ticket
-      if (!['individual','corporate','institutional','networking'].includes(ticket)) return
+      if (!['individual','corporate','institutional','networking','virtual'].includes(ticket)) return
       const isSame = ticketRef.current === ticket
       setValues(isSame ? prev => prev : { ...INITIAL, ticketType: ticket })
       setErrors({})
@@ -347,7 +355,7 @@ export default function RegistrationForm() {
   /* Also handle sessionStorage on first mount (direct page load with stored ticket) */
   useEffect(() => {
     const stored = sessionStorage.getItem('preselected_ticket') as TicketType | null
-    if (stored && ['individual','corporate','institutional','networking'].includes(stored)) {
+    if (stored && ['individual','corporate','institutional','networking','virtual'].includes(stored)) {
       sessionStorage.removeItem('preselected_ticket')
       setValues({ ...INITIAL, ticketType: stored })
       setStep(2)
@@ -489,7 +497,7 @@ export default function RegistrationForm() {
           <div className={styles.success}>
             <div className={styles.successIcon}><SuccessIcon /></div>
             <h2 className={styles.successHeading}>
-              {lane === 'individual' ? 'Seat Reserved' : lane === 'team' ? 'Briefing Requested' : lane === 'networking' ? 'Place Reserved' : 'Inquiry Received'}
+              {lane === 'individual' ? 'Seat Reserved' : lane === 'team' ? 'Briefing Requested' : lane === 'networking' ? 'Place Reserved' : lane === 'virtual' ? 'Virtual Access Requested' : 'Inquiry Received'}
             </h2>
             <p className={styles.successMessage}>
               Thank you, {values.fullName.split(' ')[0]}. Our team will be in touch within 24 hours with payment and logistics details.
@@ -604,7 +612,7 @@ export default function RegistrationForm() {
                 <>
                   <p className={styles.stepTitle}>{step2Title}</p>
 
-                  {values.ticketType !== 'networking' && (
+                  {values.ticketType !== 'networking' && values.ticketType !== 'virtual' && (
                     <>
                       <RadioCards
                         label="Organisation type" required
@@ -638,7 +646,7 @@ export default function RegistrationForm() {
                     <option value="outside">Outside Africa</option>
                   </SelectField>
 
-                  {values.ticketType !== 'networking' && (
+                  {values.ticketType !== 'networking' && values.ticketType !== 'virtual' && (
                     <>
                       <SelectField
                         label="Main priority right now" required
@@ -719,7 +727,7 @@ export default function RegistrationForm() {
                     <option value="assistant">Via my Executive Assistant</option>
                   </SelectField>
 
-                  {values.ticketType !== 'networking' && (
+                  {values.ticketType !== 'networking' && values.ticketType !== 'virtual' && (
                     <div className={styles.fieldGroup}>
                       <label className={styles.checkboxRow}>
                         <input type="checkbox" className={styles.checkboxInput}
@@ -813,6 +821,7 @@ export default function RegistrationForm() {
                       ? <><span className={styles.spinner} aria-hidden="true" /><span>Submitting…</span></>
                       : lane === 'individual' ? 'Reserve My Seat'
                       : lane === 'networking' ? 'Reserve Networking Place'
+                      : lane === 'virtual'    ? 'Register for Virtual Access'
                       : lane === 'team'       ? 'Book Team Seats'
                       :                         'Submit Institutional Inquiry'
                     }

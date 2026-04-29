@@ -8,13 +8,13 @@ import styles from './Nav.module.css'
 const NAV_LINKS = [
   { label: 'Home',        href: 'https://www.siccai.org' },
   { label: 'Overview',    href: '#overview'     },
-  { label: 'Programme',   href: '#programme'    },
-  { label: 'Why Attend',  href: '#credibility'  },
+  { label: 'Speakers',    href: '#speakers'     },
   { label: 'Pricing',     href: '#pricing'      },
+  { label: 'Sponsor',     href: '#sponsorship'  },
 ]
 
 /* ─── Countdown ──────────────────────────────────────────────────────────────── */
-const SUMMIT_DATE = new Date('2026-05-11T09:00:00+02:00')
+const SUMMIT_DATE = new Date('2026-06-11T09:00:00+02:00')
 
 function getTimeLeft() {
   const diff = SUMMIT_DATE.getTime() - Date.now()
@@ -110,7 +110,7 @@ export default function Nav() {
 
   /* Active section tracker */
   useEffect(() => {
-    const ids = ['hero', 'overview', 'programme', 'credibility', 'pricing', 'register']
+    const ids = ['hero', 'overview', 'speakers', 'pricing', 'sponsorship', 'register']
     const observers: IntersectionObserver[] = []
 
     ids.forEach(id => {

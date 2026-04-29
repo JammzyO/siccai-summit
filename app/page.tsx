@@ -1,12 +1,14 @@
 import Hero from '@/app/components/Hero/Hero'
 import SummitOverview from '@/app/components/SummitOverview/SummitOverview'
 import ThematicAreas from '@/app/components/ThematicAreas/ThematicAreas'
+import Speakers from '@/app/components/Speakers/Speakers'
 import DelegatesFormat from '@/app/components/DelegatesFormat/DelegatesFormat'
 import ObjectivesOutcomes from '@/app/components/ObjectivesOutcomes/ObjectivesOutcomes'
 import CredibilityStack from '@/app/components/CredibilityStack/CredibilityStack'
 import ObjectionHandling from '@/app/components/ObjectionHandling/ObjectionHandling'
 import OfferClarity from '@/app/components/OfferClarity/OfferClarity'
 import Pricing from '@/app/components/Pricing/Pricing'
+import Sponsorship from '@/app/components/Sponsorship/Sponsorship'
 import RegistrationForm from '@/app/components/RegistrationForm/RegistrationForm'
 
 export default function Home() {
@@ -15,12 +17,14 @@ export default function Home() {
       <Hero />
       <SummitOverview />
       <ThematicAreas />
+      <Speakers />
       <DelegatesFormat />
       <ObjectivesOutcomes />
       <CredibilityStack />
       <ObjectionHandling />
       <OfferClarity />
       <Pricing />
+      <Sponsorship />
       <RegistrationForm />
     </main>
   )

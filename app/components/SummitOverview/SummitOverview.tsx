@@ -12,8 +12,8 @@ const PILLS = [
 
 /* ─── Metadata items — left column ──────────────────────────────────────────── */
 const META = [
-  { label: 'Dates',   value: '11–15 May 2026'           },
-  { label: 'Venue',   value: 'The Bay Hotel\nCape Town, South Africa' },
+  { label: 'Dates',   value: '11–15 June 2026'           },
+  { label: 'Venue',   value: 'Cape Town International\nConvention Centre (CTICC)' },
   { label: 'Format',  value: '4 Plenary Days\n+ Networking Event'     },
   { label: 'Hosted by', value: 'SICC AI'                },
 ]

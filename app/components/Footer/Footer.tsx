@@ -65,10 +65,10 @@ export default function Footer() {
         {/* Event */}
         <div className={styles.col}>
           <p className={styles.colHeading}>Event</p>
-          <span className={styles.colItem}>The Bay Hotel</span>
+          <span className={styles.colItem}>Cape Town International Convention Centre</span>
           <span className={styles.colItem}>Cape Town, South Africa</span>
           <span className={`${styles.colItem} ${styles.colItemAccent}`}>
-            11–15 May 2026
+            11–15 June 2026
           </span>
           <span className={styles.colItem}>9:00am – 4:00pm daily</span>
           <span className={styles.hashtag}>#siccai2026</span>

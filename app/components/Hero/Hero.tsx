@@ -50,7 +50,7 @@ export default function Hero() {
         <p className={styles.eyebrow}>
           Cape Town
           <span className={styles.eyebrowDot} aria-hidden="true" />
-          11–15 May 2026
+          11–15 June 2026
           <span className={styles.eyebrowDot} aria-hidden="true" />
           Summit Training
         </p>
@@ -143,7 +143,7 @@ export default function Hero() {
           {[
             'COMESA · SADC · AU',
             'Executive Track',
-            '5 Days · The Bay Hotel',
+            '5 Days · CTICC, Cape Town',
           ].map((label) => (
             <div key={label} className={styles.stat} role="listitem">
               <span className={styles.statDot} aria-hidden="true" />

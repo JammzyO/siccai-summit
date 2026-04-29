@@ -8,7 +8,7 @@ const TIERS = [
   {
     id:        'networking',
     label:     'Networking Event',
-    seats:     '15 May 2026',
+    seats:     '15 June 2026',
     price:     '1,175',
     priceNote: 'per person · networking only',
     featured:  false,
@@ -18,7 +18,7 @@ const TIERS = [
     ctaHref:   '#register',
     delay:     0,
     inclusions: [
-      'Access to networking event — 15 May 2026',
+      'Access to networking event — 15 June 2026',
       'Cross-sector partnership forum',
       'Pan-African delegate mixer',
     ],
@@ -27,7 +27,7 @@ const TIERS = [
   {
     id:        'individual',
     label:     'Main Event · Individual',
-    seats:     '11–14 May 2026',
+    seats:     '11–14 June 2026',
     price:     '2,740',
     priceNote: 'per seat · individual rate',
     featured:  true,
@@ -37,7 +37,7 @@ const TIERS = [
     ctaHref:   '#register',
     delay:     100,
     inclusions: [
-      '4 days of executive-level training (11–14 May)',
+      '4 days of executive-level training (11–14 June)',
       'Executive workbook + governance templates',
       'Certificate of completion',
       'Institutional approval letter',
@@ -48,7 +48,7 @@ const TIERS = [
   {
     id:        'corporate',
     label:     'Main Event · Corporate',
-    seats:     '2–5 seats · 11–14 May 2026',
+    seats:     '2–5 seats · 11–14 June 2026',
     price:     '2,270',
     priceNote: 'per seat · corporate rate',
     featured:  false,
@@ -85,6 +85,27 @@ const TIERS = [
       'Path to strategic partnership / MoU',
     ],
     bonus: null,
+  },
+  {
+    id:       'virtual',
+    label:    'Virtual Attendance',
+    seats:    'Online · All 4 Plenary Days',
+    price:    null,
+    priceNote: 'Contact us for virtual pricing',
+    featured:  false,
+    ribbon:    false,
+    ribbonText: '',
+    ctaLabel:  'Enquire About Virtual Access',
+    ctaHref:   '#register',
+    delay:     350,
+    inclusions: [
+      'Live-streamed plenary sessions (11–14 June)',
+      'Access to recorded sessions post-summit',
+      'Digital executive workbook',
+      'Virtual networking forum access',
+      'Certificate of virtual participation',
+    ],
+    bonus: 'Attend from anywhere in the world',
   },
   {
     id:       'partner',
@@ -200,7 +221,7 @@ export default function Pricing() {
               className={`${styles.ctaBase} ${featured ? styles.ctaSolidGold : styles.ctaOutlined}`}
               onClick={e => {
                 e.preventDefault()
-                if (['individual','corporate','institutional','networking'].includes(id)) {
+                if (['individual','corporate','institutional','networking','virtual'].includes(id)) {
                   sessionStorage.setItem('preselected_ticket', id)
                   window.dispatchEvent(new CustomEvent('preselect-ticket', { detail: { ticket: id } }))
                 }

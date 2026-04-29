@@ -26,7 +26,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: 'Continental Summit on Cybersecurity & AI | Cape Town 2026',
   description:
-    'Join executive leaders, policymakers, and diplomats at the SICC AI Continental Summit on Cybersecurity & AI — 11–15 May 2026, The Bay Hotel, Cape Town, South Africa.',
+    'Join executive leaders, policymakers, and diplomats at the SICC AI Continental Summit on Cybersecurity & AI — 11–15 June 2026, Cape Town International Convention Centre, South Africa.',
   keywords: [
     'cybersecurity summit Africa',
     'AI executives',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'SICC AI Continental Summit on Cybersecurity & AI — Cape Town 2026',
     description:
-      'An executive summit for C-suite leaders, policymakers, and diplomats across Africa and internationally.',
+      'An executive summit for C-suite leaders, policymakers, and diplomats across Africa and internationally. 11–15 June 2026, CTICC, Cape Town.',
     siteName: 'SICC AI',
     locale: 'en_ZA',
     type: 'website',
